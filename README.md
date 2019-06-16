@@ -59,4 +59,4 @@
 
 ### 每日一题
 
--[实现简单的 new 操作符](https://github.com/mcuking/blog/issues/40)
+- [实现简单的 new 操作符](https://github.com/mcuking/blog/issues/40)
