@@ -19,6 +19,7 @@
 ### Vue 全家桶
 
 - [不吹不黑聊聊前端框架-尤雨溪](https://github.com/mcuking/blog/issues/2)
+- [keep-alive + vuex + vue-router 实现动态缓存 h5 页面](https://github.com/mcuking/blog/issues/41)
 
 ### 原生 JS
 
