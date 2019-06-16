@@ -56,3 +56,7 @@
 
 - [CSS 选择器](https://github.com/mcuking/blog/issues/4)
 - [CSS 定位](https://github.com/mcuking/blog/issues/16)
+
+### 每日一题
+
+-[实现简单的 new 操作符](https://github.com/mcuking/blog/issues/40)
