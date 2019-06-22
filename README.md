@@ -59,4 +59,7 @@
 
 ### 每日一题
 
-- [实现简单的 new 操作符](https://github.com/mcuking/blog/issues/40)
+- [【每日一题】实现简单的 new 操作符](https://github.com/mcuking/blog/issues/40)
+- [【每日一题】实现简单的 call](https://github.com/mcuking/blog/issues/44)
+- [【每日一题】实现简单的 apply](https://github.com/mcuking/blog/issues/45)
+- [【每日一题】实现简单的 bind](https://github.com/mcuking/blog/issues/46)
