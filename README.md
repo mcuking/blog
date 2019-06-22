@@ -63,3 +63,4 @@
 - [【每日一题】实现简单的 call](https://github.com/mcuking/blog/issues/44)
 - [【每日一题】实现简单的 apply](https://github.com/mcuking/blog/issues/45)
 - [【每日一题】实现简单的 bind](https://github.com/mcuking/blog/issues/46)
+- [【每日一题】简单阐述下前端路由实现原理](https://github.com/mcuking/blog/issues/47)
