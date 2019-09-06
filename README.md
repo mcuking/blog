@@ -35,10 +35,35 @@
 - [AJAX 详解](https://github.com/mcuking/blog/issues/1)
 - [String 常见操作](https://github.com/mcuking/blog/issues/7)
 
+### 深入 Webpack（预计 10 月份完成）
+
+- webpack 内部工作流程
+
+- 编写一个简易的 webpack
+
+- 开发一个自动合成雪碧图的 loader
+
+- 开发一个压缩构建资源为 zip 包的插件
+
+### 浏览器工作原理（预计 10 月份完成）
+
+- 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
+
+- 浏览器中的 JavaScript 执行机制
+
+- V8 工作原理
+
+- 浏览器中的页面循环系统
+
+- 浏览器中的页面
+
+- 浏览器中的网络
+
+- 浏览器安全
+
 ### 前端工程
 
 - [写个 Babel 插件丰富你的 console 内容](https://github.com/mcuking/blog/issues/43)
-- [mini-packing-tool 实现原理解析](https://github.com/mcuking/blog/issues/38)
 
 ### 浏览器相关
 
