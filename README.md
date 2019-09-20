@@ -1,5 +1,9 @@
 > 技术成长过程中记录一些文章，欢迎查阅 Star
 
+### 前端架构
+
+- [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
+
 ### React 全家桶
 
 - [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
