@@ -3,6 +3,7 @@
 ### 架构
 
 - [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
+- [可扩展的前端#1--架构基础（译）](https://github.com/mcuking/blog/issues/59)
 - [NodeJs 与最佳实践（译）](https://github.com/mcuking/blog/issues/58)
 
 ### React 全家桶
