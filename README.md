@@ -42,7 +42,7 @@
 - [AJAX 详解](https://github.com/mcuking/blog/issues/1)
 - [String 常见操作](https://github.com/mcuking/blog/issues/7)
 
-### 深入 Webpack（预计 10 月份完成）
+### 深入 Webpack（预计 12 月份完成）
 
 - webpack 内部工作流程
 
@@ -52,7 +52,7 @@
 
 - 开发一个压缩构建资源为 zip 包的插件
 
-### 浏览器工作原理（预计 10 月份完成）
+### 浏览器工作原理（预计 12 月份完成）
 
 - 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
 
@@ -68,8 +68,9 @@
 
 - 浏览器安全
 
-### 前端工程
+### 工程
 
+- [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
 - [写个 Babel 插件丰富你的 console 内容](https://github.com/mcuking/blog/issues/43)
 
 ### 浏览器相关
