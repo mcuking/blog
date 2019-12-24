@@ -2,6 +2,7 @@
 
 ### 架构
 
+- [Hybrid App 离线包方案实践](https://github.com/mcuking/blog/issues/63)
 - [Hybrid App 架构设计](https://github.com/mcuking/blog/issues/62)
 - [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
 - [可扩展的前端#1--架构基础（译）](https://github.com/mcuking/blog/issues/59)
@@ -43,7 +44,7 @@
 - [AJAX 详解](https://github.com/mcuking/blog/issues/1)
 - [String 常见操作](https://github.com/mcuking/blog/issues/7)
 
-### 深入 Webpack（预计 12 月份完成）
+### 深入 Webpack（预计 1 月份完成）
 
 - webpack 内部工作流程
 
@@ -51,9 +52,7 @@
 
 - 开发一个自动合成雪碧图的 loader
 
-- 开发一个压缩构建资源为 zip 包的插件
-
-### 浏览器工作原理（预计 12 月份完成）
+### 浏览器工作原理（预计 1 月份完成）
 
 - 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
 
