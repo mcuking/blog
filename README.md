@@ -11,6 +11,7 @@
 
 ### 架构
 
+- [前端分层架构实践心得](https://github.com/mcuking/blog/issues/65)
 - [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
 - [可扩展的前端#1--架构基础（译）](https://github.com/mcuking/blog/issues/59)
 - [可扩展的前端#2--常见模式（译）](https://github.com/mcuking/blog/issues/60)
