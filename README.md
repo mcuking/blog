@@ -1,9 +1,16 @@
 > 技术成长过程中记录一些文章，欢迎查阅 Star
 
-### 架构
+### 心得体会
+
+- [2019 与我的技术之路](https://github.com/mcuking/blog/issues/64)
+
+### Hybrid
 
 - [Hybrid App 离线包方案实践](https://github.com/mcuking/blog/issues/63)
-- [Hybrid App 架构设计](https://github.com/mcuking/blog/issues/62)
+- [JSBridge 实现原理解析](https://github.com/mcuking/blog/issues/39)
+
+### 架构
+
 - [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
 - [可扩展的前端#1--架构基础（译）](https://github.com/mcuking/blog/issues/59)
 - [可扩展的前端#2--常见模式（译）](https://github.com/mcuking/blog/issues/60)
@@ -80,10 +87,6 @@
 - [事件基本概念](https://github.com/mcuking/blog/issues/8)
 - [浏览器渲染原理](https://github.com/mcuking/blog/issues/13)
 - [跨域](https://github.com/mcuking/blog/issues/14)
-
-### Hybrid
-
-- [JSBridge 实现原理解析](https://github.com/mcuking/blog/issues/39)
 
 ### CSS
 
