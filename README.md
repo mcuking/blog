@@ -76,6 +76,10 @@
 
 - 浏览器安全
 
+### HTTP
+
+- [HTTP 相关概念阐述及代码演示](https://github.com/mcuking/blog/issues/67)
+
 ### 工程
 
 - [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
