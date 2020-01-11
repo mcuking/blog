@@ -1,0 +1,31 @@
+{
+  "name": "mini-react",
+  "version": "1.2.0",
+  "description": "a simple react-like library",
+  "main": "dist/mini-react.js",
+  "scripts": {
+    "build": "rimraf dist &&  webpack --config scripts/webpack.config.js --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcuking/mini-react.git"
+  },
+  "keywords": [
+    "react"
+  ],
+  "author": "mcuking",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcuking/mini-react/issues"
+  },
+  "homepage": "https://github.com/mcuking/mini-react#readme",
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "babel-loader": "^8.0.6",
+    "path": "^0.12.7",
+    "rimraf": "^3.0.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  }
+}
