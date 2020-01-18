@@ -44,6 +44,7 @@
 
 - mini-promise 实现原理讲解（预计 1 月份完成）
 - [浏览器中的 JavaScript 执行机制](https://github.com/mcuking/blog/issues/68)
+- [V8 工作原理](https://github.com/mcuking/blog/issues/69)
 - [闭包基本概念](https://github.com/mcuking/blog/issues/12)
 - [原型基本概念](https://github.com/mcuking/blog/issues/11)
 - [原型链基本概念](https://github.com/mcuking/blog/issues/17)
@@ -84,7 +85,6 @@
 下面计划 1 月份完成
 
 - 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
-- V8 工作原理
 - 浏览器中的页面循环系统
 - 浏览器中的网络
 - 浏览器安全
