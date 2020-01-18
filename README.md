@@ -74,6 +74,7 @@
 
 ### 浏览器
 
+- [宏任务和微任务：不是所有任务都是一个待遇](https://github.com/mcuking/blog/issues/70)
 - [cookie localStorage sessionStorage 区别](https://github.com/mcuking/blog/issues/3)
 - [DOM 基本操作](https://github.com/mcuking/blog/issues/7)
 - [事件基本概念](https://github.com/mcuking/blog/issues/8)
@@ -85,7 +86,6 @@
 下面计划 1 月份完成
 
 - 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
-- 浏览器中的页面循环系统
 - 浏览器中的网络
 - 浏览器安全
 
