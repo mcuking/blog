@@ -1,7 +1,11 @@
 class Promise {
   constructor(executor) {
+    if (typeof executor !== 'function') {
+      throw new TypeError(`Promise resolver ${executor} is not a function`);
+    }
+
+    this.value = undefined; // Promise的值
     this.status = 'pending'; // Promise当前的状态
-    this.data = undefined; // Promise的值
     this.onResolvedCallback = []; // Promise resolve时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
     this.onRejectedCallback = []; // Promise reject时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
 
@@ -9,7 +13,7 @@ class Promise {
       // 当前状态为pending时才会执行
       if (this.status === 'pending') {
         this.status = 'resolved';
-        this.data = value;
+        this.value = value;
         for (let i = 0; i < this.onResolvedCallback.length; i++) {
           this.onResolvedCallback[i](value);
         }
@@ -20,7 +24,7 @@ class Promise {
       // 当前状态为pending时才会执行
       if (this.status === 'pending') {
         this.status = 'rejected';
-        this.data = reason;
+        this.value = reason;
         for (let i = 0; i < this.onRejectedCallback.length; i++) {
           this.onRejectedCallback[i](reason);
         }

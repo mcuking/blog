@@ -1,15 +1,19 @@
 // 增加then方法
 class Promise {
   constructor(executor) {
+    if (typeof executor !== 'function') {
+      throw new TypeError(`Promise resolver ${executor} is not a function`);
+    }
+
+    this.value = undefined; // Promise的值
     this.status = 'pending'; // Promise当前的状态
-    this.data = undefined; // Promise的值
     this.onResolvedCallback = []; // Promise resolve时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
     this.onRejectedCallback = []; // Promise reject时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
 
     const resolve = value => {
       if (this.status === 'pending') {
         this.status = 'resolved';
-        this.data = value;
+        this.value = value;
         for (let i = 0; i < this.onResolvedCallback.length; i++) {
           this.onResolvedCallback[i](value);
         }
@@ -19,7 +23,7 @@ class Promise {
     const reject = reason => {
       if (this.status === 'pending') {
         this.status = 'rejected';
-        this.data = reason;
+        this.value = reason;
         for (let i = 0; i < this.onRejectedCallback.length; i++) {
           this.onRejectedCallback[i](reason);
         }
@@ -39,19 +43,19 @@ class Promise {
     let self = this;
     let promise2;
 
-    // 根据标准，如果then的参数不是function，则我们需要忽略它，此处以如下方式处理
+    // 根据 Promise A+ 规范，如果then的参数不是function，则我们需要忽略它，此处以如下方式处理
     onResolved = typeof onResolved === 'function' ? onResolved : function(v) {};
     onRejected = typeof onRejected === 'function' ? onRejected : function(r) {};
 
     if (self.status === 'resolved') {
       return (promise2 = new Promise(function(resolve, reject) {
-        onResolved(self.data);
+        onResolved(self.value);
       }));
     }
 
     if (self.status === 'rejected') {
       return (promise2 = new Promise(function(resolve, reject) {
-        onRejected(self.data);
+        onRejected(self.value);
       }));
     }
 

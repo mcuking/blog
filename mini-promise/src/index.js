@@ -4,14 +4,18 @@ const REJECTED = 'rejected';
 
 export default class Promise {
   constructor(executor) {
+    if (typeof executor !== 'function') {
+      throw new TypeError(`Promise resolver ${executor} is not a function`);
+    }
+
+    this.value = undefined; // Promise的值
     this.status = PENDING; // Promise当前的状态
-    this.data = undefined; // Promise的值
     this.onResolvedCallback = []; // Promise resolve时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
     this.onRejectedCallback = []; // Promise reject时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
     const resolve = value => {
       if (this.status === PENDING) {
         this.status = RESOLVED;
-        this.data = value;
+        this.value = value;
         for (let i = 0; i < this.onResolvedCallback.length; i++) {
           this.onResolvedCallback[i](value);
         }
@@ -21,7 +25,7 @@ export default class Promise {
     const reject = reason => {
       if (this.status === PENDING) {
         this.status = REJECTED;
-        this.data = reason;
+        this.value = reason;
         for (let i = 0; i < this.onRejectedCallback.length; i++) {
           this.onRejectedCallback[i](reason);
         }
@@ -59,12 +63,14 @@ export default class Promise {
       // 因为考虑到有可能throw，所以我们将其包在try/catch块里
       return (promise2 = new Promise(function(resolve, reject) {
         try {
-          let x = onResolved(self.data);
+          let x = onResolved(self.value);
           if (x instanceof Promise) {
             // 如果onResolved的返回值是一个Promise对象，直接取它的结果做为promise2的结果
             x.then(resolve, reject);
+          } else {
+            // 否则，以它的返回值做为promise2的结果
+            resolve(x);
           }
-          resolve(x); // 否则，以它的返回值做为promise2的结果
         } catch (e) {
           reject(e); // 如果出错，以捕获到的错误做为promise2的结果
         }
@@ -75,11 +81,12 @@ export default class Promise {
     if (self.status === REJECTED) {
       return (promise2 = new Promise(function(resolve, reject) {
         try {
-          let x = onRejected(self.data);
+          let x = onRejected(self.value);
           if (x instanceof Promise) {
             x.then(resolve, reject);
+          } else {
+            reject(x); // 否则，以它的返回值做为promise2的结果
           }
-          reject(x); // 否则，以它的返回值做为promise2的结果
         } catch (e) {
           reject(e);
         }
@@ -97,8 +104,9 @@ export default class Promise {
             let x = onResolved(value);
             if (x instanceof Promise) {
               x.then(resolve, reject);
+            } else {
+              resolve(x);
             }
-            resolve(x);
           } catch (e) {
             reject(e);
           }
@@ -109,8 +117,9 @@ export default class Promise {
             let x = onRejected(reason);
             if (x instanceof Promise) {
               x.then(resolve, reject);
+            } else {
+              reject(x);
             }
-            reject(x);
           } catch (e) {
             reject(e);
           }
