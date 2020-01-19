@@ -35,14 +35,13 @@
 
 ### Vue 全家桶
 
-- mvvm 实现原理讲解（预计 1 月份完成）
-- mini-vuex 实现原理讲解（预计 1 月份完成）
+- mini-vue 的响应式实现原理讲解（预计 1 月份完成）
 - [不吹不黑聊聊前端框架-尤雨溪](https://github.com/mcuking/blog/issues/2)
 - [keep-alive + vuex + vue-router 实现动态缓存 h5 页面](https://github.com/mcuking/blog/issues/41)
 
 ### 原生 JS
 
-- mini-promise 实现原理讲解（预计 1 月份完成）
+- [mini-promise 实现原理讲解](https://github.com/mcuking/blog/issues/72)
 - [浏览器中的 JavaScript 执行机制](https://github.com/mcuking/blog/issues/68)
 - [V8 工作原理](https://github.com/mcuking/blog/issues/69)
 - [闭包基本概念](https://github.com/mcuking/blog/issues/12)
