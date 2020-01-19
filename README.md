@@ -74,6 +74,7 @@
 ### 浏览器
 
 - [宏任务和微任务：不是所有任务都是一个待遇](https://github.com/mcuking/blog/issues/70)
+- [前端跨域解决方案整理](https://github.com/mcuking/blog/issues/73)
 - [cookie localStorage sessionStorage 区别](https://github.com/mcuking/blog/issues/3)
 - [DOM 基本操作](https://github.com/mcuking/blog/issues/7)
 - [事件基本概念](https://github.com/mcuking/blog/issues/8)
