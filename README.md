@@ -79,8 +79,8 @@
 - [DOM 基本操作](https://github.com/mcuking/blog/issues/7)
 - [事件基本概念](https://github.com/mcuking/blog/issues/8)
 - [浏览器渲染原理](https://github.com/mcuking/blog/issues/13)
-- [跨域](https://github.com/mcuking/blog/issues/14)
 - [前端路由的实现原理](https://github.com/mcuking/blog/issues/47)
+- [Web 页面安全：XSS 和 CSRF](https://github.com/mcuking/blog/issues/75)
 
 
 下面计划 1 月份完成
