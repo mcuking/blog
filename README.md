@@ -87,11 +87,11 @@
 
 - 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
 - 浏览器中的网络
-- 浏览器安全
 
 ### HTTP
 
 - [HTTP 相关概念阐述及代码演示](https://github.com/mcuking/blog/issues/67)
+- [HPPTS: 让数据传输更安全](https://github.com/mcuking/blog/issues/76)
 
 ### 每日一题
 
