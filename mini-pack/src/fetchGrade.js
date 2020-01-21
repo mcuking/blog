@@ -1,9 +1,12 @@
+import report from './report.js';
+
 export function fetchGrade(name) {
+  report(name);
   switch (name) {
     case 'Jerry':
-      return 99;
+      return 699;
     case 'Tom':
-      return 59;
+      return 250;
     default:
       return 0;
   }

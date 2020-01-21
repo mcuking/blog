@@ -1,31 +1,38 @@
-const { getAST, getDependencies, transform } = require('./parser');
 const path = require('path');
 const fs = require('fs');
-const { removeDir } = require('./utils');
+const { getAST, getDependencies, transform, removeDir } = require('./utils');
 
 module.exports = class Compiler {
   constructor(options) {
     const { entry, output } = options;
+    // 打包入口
     this.entry = entry;
+    // 出口
     this.output = output;
+    // 模块集
     this.modules = [];
   }
 
+  // 启动构建
   run() {
-    const entryModule = this.buildModule(this.entry, true);
-
-    this.modules.push(entryModule);
-
-    this.modules.forEach(_module => {
-      _module.dependencies.forEach(dependency => {
-        this.modules.push(this.buildModule(dependency, false));
-      });
-    });
+    this.buildModule(this.entry, true);
 
     this.emitFiles();
   }
 
+  // 递归调用直至编译所有被引用模块
   buildModule(filename, isEntry) {
+    const _module = this.build(filename, isEntry);
+
+    this.modules.push(_module);
+
+    _module.dependencies.forEach(dependency => {
+      this.buildModule(dependency, false);
+    });
+  }
+
+  // 编译单个模块
+  build(filename, isEntry) {
     let ast;
 
     if (isEntry) {
@@ -42,8 +49,10 @@ module.exports = class Compiler {
     };
   }
 
+  // 将编译的 js 模块输出到指定目录中
   emitFiles() {
-    // 将所有模块代码通过塞入
+    // 将所有模块代码分别放入一个函数中（利用函数作用域实现作用域隔离，避免变量冲突）
+    // 同时实现一个 require 方法已实现从其他模块中引入需要的变量或方法
     let modules = '';
 
     this.modules.forEach(_module => {
@@ -63,11 +72,13 @@ module.exports = class Compiler {
     })({${modules}})`;
 
     // 将编译后的代码写入到 output 指定的目录
-    const distPath = path.join(process.cwd(), '../dist');
+    const distPath = path.join(process.cwd(), './dist');
     if (fs.existsSync(distPath)) {
       removeDir(distPath);
     }
+
     fs.mkdirSync(distPath);
+
     const outputPath = path.join(this.output.path, this.output.filename);
     fs.writeFileSync(outputPath, bundle, 'utf-8');
 
@@ -75,6 +86,7 @@ module.exports = class Compiler {
     this.emitHtml();
   }
 
+  // 将 html 插入 script 标签（引入打包后的 bundle js），并输出到指定目录中
   emitHtml() {
     const publicHtmlPath = path.join(process.cwd(), './public/index.html');
     let html = fs.readFileSync(publicHtmlPath, 'utf-8');
