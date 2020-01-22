@@ -62,12 +62,12 @@
 
 ### 前端工程
 
-- [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
+- [mini-pack 实现原理讲解](https://github.com/mcuking/blog/issues/77)
 - [写个 Babel 插件丰富你的 console 内容](https://github.com/mcuking/blog/issues/43)
+- [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
 
 下面计划 1 月份完成
 
-- mini-pack 实现原理讲解
 - webpack 内部工作流程
 - 开发一个自动合成雪碧图的 loader
 
