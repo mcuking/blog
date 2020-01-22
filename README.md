@@ -62,14 +62,10 @@
 
 ### 前端工程
 
+- [webpack 内部工作流程解析](https://github.com/mcuking/blog/issues/78)
 - [mini-pack 实现原理讲解](https://github.com/mcuking/blog/issues/77)
 - [写个 Babel 插件丰富你的 console 内容](https://github.com/mcuking/blog/issues/43)
 - [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
-
-下面计划 1 月份完成
-
-- webpack 内部工作流程
-- 开发一个自动合成雪碧图的 loader
 
 ### 浏览器
 
@@ -81,12 +77,7 @@
 - [浏览器渲染原理](https://github.com/mcuking/blog/issues/13)
 - [前端路由的实现原理](https://github.com/mcuking/blog/issues/47)
 - [Web 页面安全：XSS 和 CSRF](https://github.com/mcuking/blog/issues/75)
-
-
-下面计划 1 月份完成
-
-- 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）
-- 浏览器中的网络
+- 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）（计划 1 月份完成）
 
 ### HTTP
 
