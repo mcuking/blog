@@ -62,8 +62,8 @@
 
 ### 前端工程
 
-- [webpack 内部工作流程解析（一）](https://github.com/mcuking/blog/issues/78)
-- [webpack 内部工作流程解析（二）](https://github.com/mcuking/blog/issues/79)
+- [Webpack 源码分析（1）—— Webpack 启动过程分析](https://github.com/mcuking/blog/issues/78)
+- [Webpack 源码分析（2）—— Tapable 与 Webpack 的关联](https://github.com/mcuking/blog/issues/79)
 - [mini-pack 实现原理讲解](https://github.com/mcuking/blog/issues/77)
 - [写个 Babel 插件丰富你的 console 内容](https://github.com/mcuking/blog/issues/43)
 - [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
