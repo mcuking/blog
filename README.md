@@ -35,7 +35,6 @@
 
 ### Vue 全家桶
 
-- mini-vue 的响应式实现原理讲解（预计 1 月份完成）
 - [不吹不黑聊聊前端框架-尤雨溪](https://github.com/mcuking/blog/issues/2)
 - [keep-alive + vuex + vue-router 实现动态缓存 h5 页面](https://github.com/mcuking/blog/issues/41)
 
@@ -79,7 +78,7 @@
 - [浏览器渲染原理](https://github.com/mcuking/blog/issues/13)
 - [前端路由的实现原理](https://github.com/mcuking/blog/issues/47)
 - [Web 页面安全：XSS 和 CSRF](https://github.com/mcuking/blog/issues/75)
-- 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）（计划 1 月份完成）
+- 浏览器渲染流程（HTML、CSS 和 JavaScript 文件如何变成页面）（计划 3 月份完成）
 
 ### HTTP
 
