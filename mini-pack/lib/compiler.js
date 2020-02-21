@@ -64,7 +64,7 @@ module.exports = class Compiler {
         var fn = modules[filename];
         var module = {exports: {}};
 
-        fn(require, modules, module.exports);
+        fn(require, module, module.exports);
         return module.exports;
       }
 
