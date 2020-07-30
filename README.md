@@ -32,25 +32,11 @@
 - [mini-promise 实现原理讲解](https://github.com/mcuking/blog/issues/72)
 - [浏览器中的 JavaScript 执行机制](https://github.com/mcuking/blog/issues/68)
 - [V8 工作原理](https://github.com/mcuking/blog/issues/69)
-- [闭包基本概念](https://github.com/mcuking/blog/issues/12)
-- [原型基本概念](https://github.com/mcuking/blog/issues/11)
-- [原型链基本概念](https://github.com/mcuking/blog/issues/17)
-- [继承](https://github.com/mcuking/blog/issues/15)
-- [深拷贝原理](https://github.com/mcuking/blog/issues/18)
-- [apply、call 、bind 作用和区别](https://github.com/mcuking/blog/issues/10)
-- [js 数据类型基本概念](https://github.com/mcuking/blog/issues/9)
-- [ES6 学习笔记](https://github.com/mcuking/blog/issues/5)
-- [AJAX 详解](https://github.com/mcuking/blog/issues/1)
-- [String 常见操作](https://github.com/mcuking/blog/issues/7)
 
 ### 浏览器
 
 - [宏任务和微任务：不是所有任务都是一个待遇](https://github.com/mcuking/blog/issues/70)
 - [前端跨域解决方案整理](https://github.com/mcuking/blog/issues/73)
-- [cookie localStorage sessionStorage 区别](https://github.com/mcuking/blog/issues/3)
-- [DOM 基本操作](https://github.com/mcuking/blog/issues/7)
-- [事件基本概念](https://github.com/mcuking/blog/issues/8)
-- [浏览器渲染原理](https://github.com/mcuking/blog/issues/13)
 - [Web 页面安全：XSS 和 CSRF](https://github.com/mcuking/blog/issues/75)
 
 ### React 全家桶
@@ -77,8 +63,3 @@
 
 - [HTTP 相关概念阐述及代码演示](https://github.com/mcuking/blog/issues/67)
 - [HPPTS: 让数据传输更安全](https://github.com/mcuking/blog/issues/76)
-
-### CSS
-
-- [CSS 选择器](https://github.com/mcuking/blog/issues/4)
-- [CSS 定位](https://github.com/mcuking/blog/issues/16)
