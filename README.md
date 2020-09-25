@@ -11,7 +11,7 @@
 
 ### 架构
 
-- [微前端实践心得](https://github.com/mcuking/blog/issues/81)
+- [基于 Vue 技术栈的微前端方案实践](https://github.com/mcuking/blog/issues/81)
 - [前端分层架构实践心得](https://github.com/mcuking/blog/issues/65)
 - [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
 - [可扩展的前端#1--架构基础（译）](https://github.com/mcuking/blog/issues/59)
