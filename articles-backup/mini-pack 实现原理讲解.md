@@ -1,12 +1,14 @@
 > 文章首发于我的博客 https://github.com/mcuking/blog/issues/77
 
-> 相关源码请查阅  https://github.com/mcuking/blog/tree/master/mini-pack
+> 实现源码请查阅 https://github.com/mcuking/blog/tree/master/mini-pack
 
-## 什么是 webpack
+本文主要是阐述如何一步步实现一个类似 webpack 的前端应用打包器。
 
-> 本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle。
+## webpack 的本质
+
+> 本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器 (module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图 (dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle。
 >
-> webpack 就像一条生产线，要经过一系列处理流程后才能将源文件转换成输出结果。 这条生产线上的每个处理流程的职责都是单一的，多个流程之间有存在依赖关系，只有完成当前处理后才能交给下一个流程去处理。 插件就像是一个插入到生产线中的一个功能，在特定的时机对生产线上的资源做处理。webpack 通过 Tapable 来组织这条复杂的生产线。 webpack 在运行过程中会广播事件,插件只需要监听它所关心的事件，就能加入到这条生产线中，去改变生产线的运作。 webpack 的事件流机制保证了插件的有序性，使得整个系统扩展性很好。
+> webpack 就像一条生产线，要经过一系列处理流程后才能将源文件转换成输出结果。 这条生产线上的每个处理流程的职责都是单一的，多个流程之间有存在依赖关系，只有完成当前处理后才能交给下一个流程去处理。插件就像是一个插入到生产线中的一个功能，在特定的时机对生产线上的资源做处理。webpack 通过 Tapable 来组织这条复杂的生产线。 webpack 在运行过程中会广播事件，插件只需要监听它所关心的事件，就能加入到这条生产线中，去改变生产线的运作。 webpack 的事件流机制保证了插件的有序性，使得整个系统扩展性很好。
 >
  >-- 深入浅出 webpack 吴浩麟
 
@@ -30,7 +32,7 @@
 
 在以上过程中，Webpack 会在特定的时间点广播出特定的事件，插件在监听到感兴趣的事件后会执行特定的逻辑，并且插件可以调用 Webpack 提供的 API 改变 Webpack 的运行结果
 
-## 实现一个 mini-pack
+## mini-pack 实现过程
 
 首先需要明确 mini-pack 要实现的目标：
 
@@ -38,7 +40,7 @@
 
 下面我们根据刚才对 webpack 运行机制的阐述，逐步实现 mini-pack：
 
-1.首先支持定义类似 webpack.config.js 文件，可命名为 minipack.config.js，文件内定义 output、entry 等参数，如下面所示：
+**1. 首先支持定义类似 webpack.config.js 文件，可命名为 minipack.config.js，文件内定义 output、entry 等参数**。如下面所示：
 
 ```js
 const path = require('path');
@@ -52,9 +54,10 @@ module.exports = {
 };
 ```
 
-2.然后进入编译阶段：根据 minipack.config.js 定义的参数，初始化一个 Compiler 参数，并执行 run 方法。
+**2. 然后进入编译阶段：根据 minipack.config.js 定义的参数，初始化一个 Compiler 参数，并执行 run 方法**。
 
-index.js
+index.js 代码
+
 ```js
 const Compiler = require('./compiler');
 const options = require('../minipack.config');
@@ -63,14 +66,15 @@ const options = require('../minipack.config');
 new Compiler(options).run();
 ```
 
-compiler.js
+compiler.js 代码
+
 ```js
-const { getAST, getDependencies, transform } = require('./utils');
+const {getAST, getDependencies, transform} = require('./utils');
 const path = require('path');
 
 module.exports = class Compiler {
   constructor(options) {
-    const { entry, output } = options;
+    const {entry, output} = options;
     // 打包入口
     this.entry = entry;
     // 出口
@@ -103,6 +107,7 @@ module.exports = class Compiler {
   emitFiles() {}
 };
 ```
+
 此步骤就是将入口 js 文件编译成 module 对象，格式如下：
 
 ```js
@@ -113,17 +118,17 @@ module.exports = class Compiler {
 }
 ```
 
-其中编译方法 getAST、转换ast 到 code 的方法 transform、以及获取模块依赖方法 getDependencies 均单独封装在一个 utils 文件中。
+其中编译方法 getAST、转换 ast 到 code 的方法 transform、以及获取模块依赖方法 getDependencies 均单独封装在一个 utils 文件中。
 
 ```js
 const fs = require('fs');
 const path = require('path');
-const { parse } = require('@babel/parser');
+const {parse} = require('@babel/parser');
 const traverse = require('@babel/traverse').default;
-const { transformFromAst } = require('@babel/core');
+const {transformFromAst} = require('@babel/core');
 
 module.exports = {
-  // 将路径对应的文件js代码编译成 ast
+  // 将路径对应的文件 js 代码编译成 ast
   getAST(path) {
     const content = fs.readFileSync(path, 'utf-8');
     return parse(content, {
@@ -136,7 +141,7 @@ module.exports = {
   getDependencies(ast) {
     const dependencies = [];
     traverse(ast, {
-      ImportDeclaration({ node }) {
+      ImportDeclaration({node}) {
         dependencies.push(node.source.value);
       }
     });
@@ -146,7 +151,7 @@ module.exports = {
   // 将转化后 ast 的代码重新转化成代码
   // 并通过配置 @babel/preset-env 预置插件编译成 es5
   transform(ast) {
-    const { code } = transformFromAst(ast, null, {
+    const {code} = transformFromAst(ast, null, {
       presets: ['@babel/preset-env']
     });
     return code;
@@ -154,15 +159,15 @@ module.exports = {
 };
 ```
 
-3.确定入口，根据配置中的 entry 找出所有的入口文件，上面已经实现了对 entry 文件的编译。
+**3. 确定入口，根据配置中的 entry 找出所有的入口文件，上面已经实现了对 entry 文件的编译**。
 
-4.从入口文件出发，对模块进行编译（这里并不打算支持运行 loader），再找出该模块依赖的模块，再递归本步骤直到所有入口依赖的文件都经过了本步骤的处理。也就是说通过 babel-traverse 工具遍历这个模块 ast 上的 ImportDeclaration 节点（对应代码中 import），查找这个模块所有的 import 的其他模块，然后以递归的方式编译其他模块，重复刚才的操作。新增代码如下：
+**4. 从入口文件出发，对模块进行编译（这里并不打算支持运行 loader），再找出该模块依赖的模块，再递归本步骤直到所有入口依赖的文件都经过了本步骤的处理。也就是说通过 babel-traverse 工具遍历这个模块 ast 上的 ImportDeclaration 节点（对应代码中 import），查找这个模块所有的 import 的其他模块，然后以递归的方式编译其他模块，重复刚才的操作**。新增代码如下：
 
 compiler.js
 ```js
 module.exports = class Compiler {
   constructor(options) {
-    const { entry, output } = options;
+    const {entry, output} = options;
     // 打包入口
     this.entry = entry;
     // 出口
@@ -212,17 +217,17 @@ module.exports = class Compiler {
 };
 ```
 
-5.完成模块编译，上面的代码已经实现了递归编译所有被引用的模块。
+**5. 完成模块编译，上面的代码已经实现了递归编译所有被引用的模块**。
 
-6.输出资源，这里 mini-pack 准备将所有模块打包放入一个文件里，并非像 webpack 那样组装成一个个包含多个模块的 Chunk，再把每个 Chunk 转换成一个单独的文件加入到输出列表。
+**6. 输出资源，这里 mini-pack 准备将所有模块打包放入一个文件里，并非像 webpack 那样组装成一个个包含多个模块的 Chunk，再把每个 Chunk 转换成一个单独的文件加入到输出列表**。
 
-既然要将所有模块的代码打包进一个文件中，那么势必会导致命名冲突问题，为了保证各个模块互不影响，可以将不同模块分别用一个函数来包裹下（利用 js 函数作用域）。那么又会存在另一个问题--模块之间的引用问题。对此我们可以自定义 require 函数，用来引用其他模块的变量或方法，然后将自定义的 require 方法以参数的形式传入刚刚的包裹函数中，以供模块中代码调用。具体模式如下：
+既然要将所有模块的代码打包进一个文件中，那么势必会导致命名冲突问题，为了保证各个模块互不影响，可以将不同模块分别用一个函数来包裹下（利用 js 函数作用域）。那么又会存在另一个问题 -- 模块之间的引用问题。对此我们可以自定义 require 函数，用来引用其他模块的变量或方法，然后将自定义的 require 方法以参数的形式传入刚刚的包裹函数中，以供模块中代码调用。具体模式如下：
 
 ```js
 (function(modules) {
   function require(filename) {
     var fn = modules[filename];
-    var module = { exports: {} };
+    var module = {exports: {} };
 
     fn(require, module, module.exports);
     return module.exports;
@@ -244,7 +249,7 @@ module.exports = class Compiler {
 });
 ```
 
-因此代码可继续完善如下：
+因此 Compiler 实现代码可继续完善如下：
 
 ```js
 module.exports = class Compiler {
@@ -296,17 +301,16 @@ module.exports = class Compiler {
 
       return require('${this.entry}')
     })({${modules}})`;
-  
   }
 };
 ```
 
-7.输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。即通过 fs 模块将编译后大代码输出到指定目录中。代码如下：
+**7. 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。即通过 fs 模块将编译后大代码输出到指定目录中**。代码如下：
 
 ```js
 module.exports = class Compiler {
   constructor(options) {
-    const { entry, output } = options;
+    const {entry, output} = options;
     // 打包入口
     this.entry = entry;
     // 出口
@@ -390,11 +394,11 @@ module.exports = class Compiler {
 ```js
 const path = require('path');
 const fs = require('fs');
-const { getAST, getDependencies, transform, removeDir } = require('./utils');
+const {getAST, getDependencies, transform, removeDir} = require('./utils');
 
 module.exports = class Compiler {
   constructor(options) {
-    const { entry, output } = options;
+    const {entry, output} = options;
     // 打包入口
     this.entry = entry;
     // 出口
@@ -491,3 +495,7 @@ module.exports = class Compiler {
   }
 };
 ```
+
+## 结束语
+
+到这里一个简单的前端项目打包器已经实现了，完整实现代码请查阅 [mini-pack](https://github.com/mcuking/blog/tree/master/mini-pack)。经历了整个过程，相信读者对前端项目打包过程的理解会更加深入了。

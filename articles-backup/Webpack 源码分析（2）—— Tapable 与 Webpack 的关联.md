@@ -104,11 +104,11 @@ class Compiler extends Tapable {
 
 关于 tapable 的内部源码我们就不去分析了，而是采用另一种思路，通过查询 tapable 仓库的文档和相关资料，参考 webpack 中使用 Tapable 的方式，用代码实现一个类似的 demo。
 
-### Tapable 是什么
+## Tapable 是什么
 
 Tapable 是一个类似 NodeJS 的 EventEmitter 的库，主要通过钩子函数的发布与订阅来实现 webpack 的插件系统。
 
-### Tapable 的基本使用
+## Tapable 的基本使用
 
 Tapable 暴露出来的都是类方法，可以通过 new 一个类方法来获得我们需要的钩子。
 
@@ -159,7 +159,7 @@ hook1.tap('hook1', (arg1, arg2) => console.log(arg1, arg2));
 hook1.call(1, 2);
 ```
 
-### 模拟 Webpack 使用 Tapable 方式
+## 模拟 Webpack 使用 Tapable 方式
 
 源码请参考 https://github.com/mcuking/blog/tree/master/tapable-demo
 

@@ -10,7 +10,7 @@
 },
 ```
 
-### 分析 webpack 入口文件：webpack.js
+## 分析 webpack 入口文件：webpack.js
 
 文件代码并不多，总共有 171 行，主要分为 6 个部分：
 
@@ -85,7 +85,7 @@ else {...}
 
 那么我们就去看下 webpack-cli 具体做了什么工作。
 
-### 分析 webpack-cli 运行机制
+## 分析 webpack-cli 运行机制
 
 当前分析的 webpack-cli 版本为 3.3.10，通过 webpack-cli 包的 package.json 的 bin 字段我们可以确认 webpack-cli 的入口执行文件是 `node_modules\webpack-cli\bin\cli.js`
 

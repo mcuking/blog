@@ -4,13 +4,10 @@
 
 - [2019 与我的技术之路](https://github.com/mcuking/blog/issues/64)
 
-### Hybrid
+### 架构
 
 - [Hybrid App 离线包方案实践](https://github.com/mcuking/blog/issues/63)
 - [JSBridge 实现原理解析](https://github.com/mcuking/blog/issues/39)
-
-### 架构
-
 - [基于 Vue 技术栈的微前端方案实践](https://github.com/mcuking/blog/issues/81)
 - [前端分层架构实践心得](https://github.com/mcuking/blog/issues/65)
 - [前端架构-让重构不那么痛苦（译）](https://github.com/mcuking/blog/issues/57)
@@ -24,7 +21,6 @@
 - [Webpack 源码分析（1）—— Webpack 启动过程分析](https://github.com/mcuking/blog/issues/78)
 - [Webpack 源码分析（2）—— Tapable 与 Webpack 的关联](https://github.com/mcuking/blog/issues/79)
 - [Webpack 源码分析（3）—— Webpack 构建流程分析](https://github.com/mcuking/blog/issues/80)
-- [Github + Jenkins + Docker 实现自动化部署](https://github.com/mcuking/blog/issues/61)
 
 ### 迷你系列
 
@@ -39,7 +35,3 @@
 - [mini-redux 实现原理讲解 第四讲](https://github.com/mcuking/blog/issues/29)
 - [mini-pack 实现原理讲解](https://github.com/mcuking/blog/issues/77)
 - [mini-promise 实现原理讲解](https://github.com/mcuking/blog/issues/72)
-
-### HTTP
-
-- [HTTP 相关概念阐述及代码演示](https://github.com/mcuking/blog/issues/67)

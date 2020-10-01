@@ -4,15 +4,13 @@
 
 本讲主要解决如何在 react 中更优雅的使用 redux，即实现 react-redux
 
-# Provider
+## Provider
 
 在实现 react-redux 之前，我们首先需要了解 react 的 context 机制。当需要将某个数据设置为全局，即可使用 context 在父组件声明，这样其下面的所有子组件都可以获取到这个数据。
 
-（注意，在最新的 react 16.3(.0-alpha)中，context 机制已经更新，功能更加强大，详情请参考我的译文 [React 16.3(.0-alpha)新特性-译](https://github.com/mcuking/js-blog/issues/19))
-
 基于 context 机制，我们定义一个 Provider，作为应用的一级组件，专门负责将传入的 store 放到 context 里，所有子组件均可以直接获取 store，并不渲染任何东西。
 
-```javascript
+```js
 // Provider 负责将store放到context里，所有子组件均可以直接获取store
 export class Provider extends Component {
   // 使用context需要使用propType进行校验
@@ -38,7 +36,7 @@ export class Provider extends Component {
 
 对应业务代码如下：
 
-```javascript
+```js
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from './mini-redux';
@@ -55,7 +53,7 @@ ReactDOM.render(
 );
 ```
 
-# connect
+## connect
 
 connect 负责连接组件，将 redux 中的数据传入组件的属性里，因此需要完成下面两件事：
 
@@ -66,7 +64,7 @@ connect 负责连接组件，将 redux 中的数据传入组件的属性里，�
 
 - mapStateToProps，是一个函数，入参为全局 state，并返回全局 state 中组件需要的的数据，代码如下：
 
-```javascript
+```js
 const mapStateToProps = state => {
   return {
     num: state
@@ -76,7 +74,7 @@ const mapStateToProps = state => {
 
 - mapDispatchToProps，是一个对象，对象里面为 action（用来改变全局状态的对象）的生成函数，代码如下：
 
-```javascript
+```js
 const mapDispatchToProps = {
   buyHouse,
   sellHouse
@@ -94,7 +92,7 @@ export function sellHouse() {
 
 第一步，我们将 mapStateToProps 的返回值，即组件需要的全局状态 state 中的某个状态，以参数的形式传给新构建的组件，代码如下：
 
-```javascript
+```js
 export const connect = (
   mapStateToProps = state => state,
   mapDispatchToProps = {}
@@ -142,7 +140,7 @@ export const connect = (
 
 联想到上一讲 redux 中，修改全局状态，需要使用 store 的 dispatch 方法，dispatch 对应代码如下：
 
-```javascript
+```js
 function dispatch(action) {
   // reducer根据老的state和action计算新的state
   currentState = reducer(currentState, action);
@@ -155,13 +153,13 @@ function dispatch(action) {
 
 其中需要外部传入 action，即一个对象，例如`{type: BUY_HOUSE}`。因此我们需要将 buyHouse 方法的返回值 action 对象，传给 store.dispatch 方法，执行后才能改变全局状态。对应代码如下：
 
-```javascript
+```js
 buyHouse = () => store.dispatch(buyHouse());
 ```
 
 对此，我们封装一个方法 bindActionCreators，入参为 mapDispatchToProps 和 store.dispatch，返回类似 buyHouse = () => store.dispatch(buyHouse())的方法的集合，即使用 dispatch 将 actionCreator 的返回值包一层，代码如下：
 
-```javascript
+```js
 // 将 buyHouse(...arg) 转换为 (...arg) => store.dispatch(buyHouse(...arg))
 function bindActionCreator(creator, dispatch) {
   return (...arg) => dispatch(creator(...arg)); // 参数arg透传
@@ -179,7 +177,7 @@ export function bindActionCreators(creators, dispatch) {
 
 因此，我们就可以第一步的基础上，将 store.dispatch 包装后的 actionCreator 集合对象，传给组件，代码如下：
 
-```javascript
+```js
 export const connect = (
   mapStateToProps = state => state,
   mapDispatchToProps = {}
@@ -236,7 +234,7 @@ export const connect = (
 
 注意，除了将 dispatchProps 传给组件之外，上面代码还在组件的 componentDidMount 生命周期中，将 update 函数设置为监听函数，即
 
-```
+```js
 store.subscribe(() => this.update())
 ```
 

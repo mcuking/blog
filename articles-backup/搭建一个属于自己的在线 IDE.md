@@ -1,14 +1,14 @@
 > 文章首发于我的博客 https://github.com/mcuking/blog/issues/86
 
-## 背景介绍
+## 背景
 
 这几个月在公司内做一个跨前端项目之间共享组件/区块的工程，主要思路就是在 [Bit](https://github.com/teambit/bit) 的基础上进行开发。Bit 主要目的是实现不同项目 **共享** 与 **同步** 组件/区块，大致思路如下：
 
-在 A 项目中通过执行 Bit 提供的命令行工具将需要共享的组件/区块的源码推送到远端仓库，然后在 B 项目中就可以同样通过 Bit 提供的命令行工具拉取存储在 Bit 远程仓库的组件/区块。听起来比较像 Git，主要的区别是 Bit 除了推送源码之外，还会包括组件的依赖图谱分析、版本管理等功能。下面这张图就描述了 Bit 的实现思路。更多细节可以参考 Bit 官方文档 [Bit-Docs](https://docs.bit.dev/docs/how-bit-works)
+在 A 项目中通过执行 Bit 提供的命令行工具将需要共享的组件/区块的源码推送到远端仓库，然后在 B 项目中就可以同样通过 Bit 提供的命令行工具拉取存储在 Bit 远程仓库的组件/区块。听起来比较像 Git，主要的区别是 Bit 除了推送源码之外，还会包括组件的依赖图谱分析、组件的版本管理等功能。下面这张图就描述了 Bit 的实现思路。更多细节可以参考 Bit 官方文档 [Bit-Docs](https://docs.bit.dev/docs/how-bit-works)
 
 ![Bit 原理图.png](https://i.loli.net/2020/09/12/t2snHPxMlB6UpvY.png)
 
-虽然 Bit 开源了命令行工具，但并没有开源共享组件/区块的展示站点，类似 Bit 官方提供的网站 [https://bit.dev](https://bit.dev)。也就是说使用者无法通过浏览组件/区块的构建后的视图的方式，来查找保存在 Bit 远程仓库的组件/区块代码。Bit 网站效果如下图：
+虽然 Bit 开源了命令行工具，但并没有开源共享组件/区块的展示站点，类似 Bit 官方提供的网站 [bit.dev](https://bit.dev)。也就是说使用者无法通过浏览组件/区块的构建后的视图的方式，来查找保存在 Bit 远程仓库的组件/区块代码。Bit 网站效果如下图：
 
 ![Bit 网站效果图.png](https://i.loli.net/2020/09/23/RSmKrXlgpsON8tV.png)
 
@@ -28,7 +28,7 @@
 
 3. 特殊的功能无法实现，例如点击页面的按钮，可以实现对在线 IDE 右侧构建出来的页面进行截图，并将图片数据传输出来；
 
-4. 使用在线 IDE 提供的服务，一般意味这你的组件/区块是暴露在公网上的，然而可能有些代码涉密，是不能上传到公网上的。
+4. 使用在线 IDE 提供的服务，一般意味着你的组件/区块是暴露在公网上的，然而可能有些代码涉密，是不能上传到公网上的。
 
 5. 部分构建工具依赖 node_modules 等文件，无法在没有 node_modules 的浏览器中正常工作。例如 babel 插件等。这个在后面的定制 CodeSandbox 功能部分会举个例子细说。
 
@@ -38,13 +38,11 @@
 
 ## CodeSandbox 基本原理
 
-笔者主要研究的是 CodeSandbox [https://github.com/codesandbox](https://github.com/codesandbox) 以及 Stackblitz
-[https://github.com/stackblitz](https://github.com/stackblitz) 。这两个都是商业化的项目，其中 Stackblitz 的核心部分并没有开源出来，而 CodeSandbox
-绝大部分的功能都已经开源出来了，所以最终选择了 CodeSandbox。
+笔者主要研究的是 [Codesandbox](https://github.com/codesandbox) 以及 [Stackblitz](https://github.com/stackblitz) 。这两个都是商业化的项目，其中 Stackblitz 的核心部分并没有开源出来，而 CodeSandbox 绝大部分的功能都已经开源出来了，所以最终选择了 CodeSandbox。
 
 为了方便后续讲解如何定制和部署 CodeSandbox，这里大概说一下它的基本原理（**下面主要引用了[CodeSandbox 如何工作? 上篇](https://bobi.ink/2019/06/20/codesandbox/) 的部分内容**）：
 
-CodeSandbox 最大的特点是采用在浏览器端做项目构建，也就是说打包和运行不依赖服务器。由于浏览器端并没有 Node 环境，所以 CodeSandbox **自己实现了一个可以跑在浏览器端的简化版 webpack。**
+CodeSandbox 最大的特点是采用在浏览器端做项目构建，也就是说打包和运行不依赖服务器。由于浏览器端并没有 Node 环境，所以 CodeSandbox **自己实现了一个可以跑在浏览器端的简化版 webpack**。
 
 ### CodeSandbox 组成部分
 
@@ -70,11 +68,11 @@ CodeSandbox 最大的特点是采用在浏览器端做项目构建，也就是�
 
 #### Packager--npm 包打包阶段
 
-Packager 阶段的代码实现是在 [https://github.com/codesandbox/dependency-packager](https://github.com/codesandbox/dependency-packager) 里，这是一个基于 [express](https://expressjs.com/) 框架提供的服务，并且部署采用了 Serverless(基于 AWS Lambda) 方式，让 Packager 服务更具伸缩性，可以灵活地应付高并发的场景。（注：在私有化部署中如果没有 Serverless 环境，可以将源码中有关 AWS Lambda 部分全部注释掉即可 ）
+Packager 阶段的代码实现是在 CodeSandbox 托管在 GitHub 上的仓库 [dependency-packager](https://github.com/codesandbox/dependency-packager) 里，这是一个基于 [express](https://expressjs.com/) 框架提供的服务，并且部署采用了 Serverless(基于 AWS Lambda) 方式，让 Packager 服务更具伸缩性，可以灵活地应付高并发的场景。（注：在私有化部署中如果没有 Serverless 环境，可以将源码中有关 AWS Lambda 部分全部注释掉即可 ）
 
-以 react 包为例，讲解下 Packager 服务的原理，首先 express 框架接收到请求中的包名以及包版本，例如 react@16.8.0。**然后通过 yarn 下载 react 以及 react 的依赖包到磁盘上，通过读取 npm 包的 package.json 文件中的 browser、module、main、unpkg 等字段找到 npm 包入口文件，然后解析 AST 中所有的 require 语句，将被 require 的文件内容添加到 manifest 文件中，并且递归执行刚才的步骤，最终形成依赖图。实现了剔除 npm 模块中多余的文件的目的。**最后返回给 Sandbox 进行编译。下面是一个 manifest 文件的示例：
+以 react 包为例，讲解下 Packager 服务的原理，首先 express 框架接收到请求中的包名以及包版本，例如 react@16.8.0。**然后通过 yarn 下载 react 以及 react 的依赖包到磁盘上，通过读取 npm 包的 package.json 文件中的 browser、module、main、unpkg 等字段找到 npm 包入口文件，然后解析 AST 中所有的 require 语句，将被 require 的文件内容添加到 manifest 文件中，并且递归执行刚才的步骤，最终形成依赖图。这样就实现将 npm 包文件内容转移到 manifest.json 上的目的，同时也实现了剔除 npm 模块中多余的文件的目的**。最后返回给 Sandbox 进行编译。下面是一个 manifest 文件的示例：
 
-``` js
+```js
 {
     // 模块内容
     "contents": {
@@ -108,11 +106,11 @@ Packager 阶段的代码实现是在 [https://github.com/codesandbox/dependency-
 
 #### Transpilation--编译阶段
 
-当 Sandbox 从 Editor 接收到前端项目的源代码、npm 依赖以及构建模板 Preset。目前仅支持几个应用模板，例如 `vue-cli` 、 `create-react-app` 。**Sandbox 会初始化配置，然后从 Packager 服务下载 npm 依赖包对应的 manifest 文件，接着从前端项目的入口文件开始对项目进行编译，并解析 AST 递归编译被 require 的文件，形成依赖图**（注：和 webpack 原理基本一致）。
+当 Sandbox 从 Editor 接收到前端项目的源代码、npm 依赖以及构建模板 Preset。**Sandbox 会初始化配置，然后从 Packager 服务下载 npm 依赖包对应的 manifest 文件，接着从前端项目的入口文件开始对项目进行编译，并解析 AST 递归编译被 require 的文件，形成依赖图**（注：和 webpack 原理基本一致）。
 
-注意 CodeSandbox 支持外部预定义项目的构建模板 Preset。而 Preset 规定了针对某一类型的文件，采用那些 Transpiler（相当于 Webpack 的 Loader）对文件进行编译。但是不支持修改 Preset 中的具体配置。Preset 示例配置如下：
+注意 CodeSandbox 支持外部预定义项目的构建模板 Preset。Preset 规定了针对某一类型的文件，采用哪些 Transpiler（相当于 Webpack 的 Loader）对文件进行编译。目前可供选择的 Preset 选项有： `vue-cli` 、 `create-react-app`、`create-react-app-typescript`、 `parcel`、`angular-cli`、`preact-cli`。但是不支持修改某个 Preset 中的具体配置，这些都是内置在 CodeSandbox 源码中的。Preset 具体配置示例如下：
 
-``` js
+```js
 import babelTranspiler from "../../transpilers/babel";
 ...
 
@@ -176,7 +174,7 @@ CMD ["npm", "run", "dev"]
 
 ### 编辑器 Editor
 
-在 CodeSandbox-client 工程中的 [standalone-packages/react-sandpack](https://github.com/codesandbox/codesandbox-client/tree/master/standalone-packages/react-sandpack) 项目，就是 CodeSandbox 提供的基于 [react](https://reactjs.org/) 实现的的编辑器项目。区别于主项目实现的编辑器，这个编辑器主要是为了给使用者进行定制，所以实现的比较简陋，使用者可以根据自己的需求在这个编辑器的基础上加入自己需要的功能。当然如果没有自定义需求的话，可以直接使用 react-sandpack 项目对应的 npm 包 [react-smooshpack](https://www.npmjs.com/package/react-smooshpack)，使用方式如下：
+在 CodeSandbox-client 工程中的 [standalone-packages/react-sandpack](https://github.com/codesandbox/codesandbox-client/tree/master/standalone-packages/react-sandpack) 项目，就是 CodeSandbox 提供的基于 [react](https://reactjs.org/) 实现的的编辑器项目。区别于主项目实现的编辑器，这个编辑器主要是为了给使用者进行定制，所以实现的比较简陋，使用者可以根据自己的需求在这个编辑器的基础上加入自己需要的功能。当然如果没有自定义编辑器的需求，可以直接使用 react-sandpack 项目对应的 npm 包 [react-smooshpack](https://www.npmjs.com/package/react-smooshpack)，使用方式如下：
 
 ``` ts
 import React from 'react';
@@ -226,7 +224,7 @@ render(<App />, document.getElementById('root'));
 
 ### 代码运行沙盒 SandBox 
 
-怕大家误解先提前说明下，上一小节提到的构建服务并不是后端服务，这个服务其实就是 CodeSandbox 构建出来的前端页面，因为上面原理部分已经阐述了 CodeSandbox 实际上在浏览器里实现了一个 webpack，项目的构建全部是在浏览器中完成的。
+怕大家误解先提前说明下，上一小节提到的构建服务并不是后端服务，这个服务其实就是 CodeSandbox 构建出来的前端页面。基本原理部分已经阐述了 CodeSandbox 实际上在浏览器里实现了一个 webpack，项目的构建全部是在浏览器中完成的。
 
 而 CodeSandbox 前端构建的核心部分的目录在 CodeSandbox-client 工程中 [packages/app](https://github.com/codesandbox/codesandbox-client/tree/master/packages/app) 项目，其中的原理已经在上面阐述过了，这里只需要将该项目构建出来的 www 文件夹部署到服务器即可。由于该核心库又依赖了其他库，所以也需要先构建下依赖库。下面笔者写了一个 build.sh 文件，放置在整个项目的一级目录即可。
 
@@ -282,43 +280,42 @@ COPY --from=build /packages/app/www /usr/share/nginx/html/
 
 **在线 npm 打包服务侧**
 
-在线 npm 打包服务一般只会返回 js 文件，所以需要在该服务中增加一个功能--当判断请求的 npm 包为内建组件，则还要额外返回样式文件。下面是 [dependence-packager](https://github.com/codesandbox/dependency-packager) 项目中添加的核心代码：
+在线 npm 打包服务一般只会返回 js 文件，所以需要在该服务基础上增加一个功能：当判断请求的 npm 包为内建组件，则还要额外返回样式文件。下面是 [dependence-packager](https://github.com/codesandbox/dependency-packager) 项目中添加的核心代码：
 
 为了提供获取私有组件样式文件的方法，可以新建一个文件 `functions/packager/utils/fetch-builtin-component-style.ts` ，核心代码如下：
 
 ``` ts
+// 根据组件 npm 包名以及通过 yarn 下载到磁盘上的 npm 包路径，读入对应的样式文件内容，并写入到 manifest.json 的 contents 对象上
+const insertStyle = (contents: any, packageName: string, packagePath: string) => {
+  const stylePath = `node_modules/${packageName}/dist/index.css`;
+  const styleFilePath = join(
+    packagePath,
+    `node_modules/${packageName}/dist/index.css` ,
+  );
+
+  if (fs.existsSync(styleFilePath)) {
+    contents[stylePath] = {
+      contents: fs.readFileSync(styleFilePath, "utf-8"),
+      isModule: false,
+    };
+  }
+};
+
+// 获取内建组件的样式文件，并写入到返回给 Sandbox 的 manifest.json 文件中
 const fetchBuiltinComponentStyle = (
-  content: any,
+  contents: any,
   packageName: string,
   packagePath: string,
   dependencyDependencies: any,
 ) => {
+  // 当 npm 包或者其依赖以及依赖的依赖中有内建组件，则将该内建组件对应的样式文件写入到 manifest.json 文件中
   if (isBuiltinComponent(packageName)) {
-    const cssPath = join(
-      packagePath,
-      `node_modules/${packageName}/dist/index.css` ,
-    );
-    if (fs.existsSync(cssPath)) {
-      content[ `/node_modules/${packageName}/dist/index.css` ] = {
-        content: fs.readFileSync(cssPath, "utf-8"),
-        isModule: false,
-      };
-    }
+    insertStyle(contents, packageName, packagePath);
 
     Object.keys(dependencyDependencies.dependencyDependencies).forEach(
       (pkgName) => {
         if (isBuiltinComponent(pkgName)) {
-          const cssPath = join(
-            packagePath,
-            `node_modules/${pkgName}/dist/index.css` ,
-          );
-
-          if (fs.existsSync(cssPath)) {
-            content[ `/node_modules/${pkgName}/dist/index.css` ] = {
-              content: fs.readFileSync(cssPath, "utf-8"),
-              isModule: false,
-            };
-          }
+          insertStyle(contents, pkgName, packagePath);
         }
       },
     );
@@ -350,6 +347,7 @@ const response = {
 浏览器 CodeSandbox 侧需要提供处理私有组件样式的方法，主要是在 Evaluation 执行阶段将样式文件内容通过 style 标签动态插入到 head 标签上面，可以新建一个文件 `packages/app/src/sandbox/eval/utils/insert-builtin-component-style.ts` ，下面是核心代码：
 
 ``` ts
+// 基于样式文件内容创建 style 标签，并插入到 head 标签上
 const insertStyleNode = (content: string) => {
 	const styleNode = document.createElement('style');
 	styleNode.type = 'text/css';
@@ -360,6 +358,7 @@ const insertStyleNode = (content: string) => {
 const insertBuiltinComponentStyle = (manifest: any) => {
   const {contents, dependencies, dependencyDependencies} = manifest;
 
+  // 从依赖以及依赖的依赖中根据 npm 包名筛选出内建组件
   const builtinComponents = Object.keys(dependencyDependencies).filter(pkgName => isBuiltinComponent(pkgName));
 	dependencies.map((d: any) => {
 		if (isBuiltinComponent(d.name)) {
@@ -367,6 +366,7 @@ const insertBuiltinComponentStyle = (manifest: any) => {
 		}
 	});
 
+  // 根据基于内建组件 npm 名称拼装成的 key 查找到具体的文件内容，并调用 insertStyleNode 方法插入到 head 标签上
 	builtinComponents.forEach(name => {
 		const { content } = contents[ `/node_modules/${name}/dist/index.css` ];
 		if (content) {
@@ -396,13 +396,13 @@ setManifest(manifest?: Manifest) {
 
 ### 添加预览区域截图功能
 
-在区块复用平台项目中，在点击保存按钮时，不仅要保存编辑好的代码，还需要对构建好的右侧预览区域进行截图并保存。如下图所示。
+在区块复用平台项目中，在点击保存按钮时，不仅要保存编辑好的代码，还需要对构建好的右侧预览区域进行截图并保存。如下图所示:
 
-![image](https://user-images.githubusercontent.com/22924912/93729298-79ab0880-fbf6-11ea-88d5-d8657ae3a247.png)
+![ide 截图功能](https://user-images.githubusercontent.com/22924912/93729298-79ab0880-fbf6-11ea-88d5-d8657ae3a247.png)
 
 右侧预览区域所展示的内容是 SandpackProvider 组件插入的 iframe，所以只需要找到这个 iframe，然后通过 postMessage 与 iframe 内页面进行通信。当 iframe 内部页面接收到截图指令后，对当前 dom 进行截图并传出即可，这里笔者用的是 html2canvas 进行截图的。下面是 CodeSandbox 侧的代码改造，文件在 `packages/app/src/sandbox/index.js` 中，主要是在文件结尾处添加如下代码：
 
-``` js
+```js
 const fetchScreenShot = async () => {
     const app = document.querySelector('#root');
     const c = await html2canvas(app);
@@ -432,10 +432,6 @@ window.addEventListener('message', receiveMessageFromIndex, false);
 ```
 
 在 CodeSandbox 使用侧，则需要在需要截图的时候，向 iframe 发送截图指令。同时也需要监听 iframe 发来的消息，从中筛选出返回截图数据的指令，并获取到截图数据。由于实现比较简单，这里就不展示具体代码了。
-
-```js
-
-```
 
 ### create-react-app 模板中添加对 less 文件编译的支持
 
@@ -484,8 +480,11 @@ function dependencyToPackagePath(name: string, version: string) {
 
 ## 结束语
 
-到此为止，私有化部署一个属于自己并且可以任意定制的在线 IDE 的目标就已经达成了。接下来如果读者感兴趣的话，可以接着阅读基于 Bit 和 CodeSandbox 实现的区块平台项目--[跨项目区块共享方案实践](https://github.com/mcuking/blog/issues/87)
+到此为止，私有化部署一个属于自己并且可以任意定制的在线 IDE 的目标就已经达成了。当然在线 IDE 的项目构建不仅仅局限在浏览器中，还可以将整个构建过程放在服务端，借助于云+容器化的能力，使得在线 IDE 有着跟本地IDE几乎完全一样的功能。其实这两者应用的场景不多，完全基于浏览器构建更适用于单一页面项目的实时预览，而基于服务端构建是完全可以适用于真实的项目开发的，并且不仅仅局限于前端项目。笔者也在尝试探索基于服务端构建 IDE 的可能性，期待后面能够有些产出分享给大家。
 
-## 参考文章
+接下来如果读者感兴趣的话，可以继续阅读基于 Bit 和 CodeSandbox 实现的区块平台项目--[跨项目区块复用方案实践](https://github.com/mcuking/blog/issues/88)
+
+## 参考资料
 
 - [CodeSandbox 如何工作? 上篇](https://bobi.ink/2019/06/20/codesandbox/)
+- [GitLab hosted Codesandbox](https://gitlab.com/gitlab-org/gitlab/-/issues/27144)

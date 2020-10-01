@@ -2,27 +2,28 @@
 
 > 相关代码请查阅 https://github.com/mcuking/blog/tree/master/mini-react
 
-# 更新属性
-本讲接着上一讲diff算法简介，主要介绍其中更新属性的机制。
-对比新的vnode的props和老的vnode的props，
+## 更新属性
 
-- 找到仅存在于新DOM节点属性的集合，调用setAttrs(olddom, onlyInLeft)
-- 找到仅存在于旧DOM节点属性的集合，调用removeAttrs(olddom, onlyInRight)
-- 找到旧DOM节点和新DOM节点均存在的属性的集合，调用diffAttrs(olddom, bothIn.left, bothIn.right)
+本讲接着上一讲 diff 算法简介，主要介绍其中更新属性的机制。
+对比新的 vnode 的 props 和老的 vnode 的 props，
 
-```javascript
+- 找到仅存在于新 DOM 节点属性的集合，调用 setAttrs(olddom, onlyInLeft)
+- 找到仅存在于旧 DOM 节点属性的集合，调用 removeAttrs(olddom, onlyInRight)
+- 找到旧 DOM 节点和新 DOM 节点均存在的属性的集合，调用 diffAttrs(olddom, bothIn.left, bothIn.right)
+
+```js
 // 更新属性
-const { onlyInLeft, onlyInRight, bothIn } = diffObject(vnode.props, olddom._vnode.props)
+const {onlyInLeft, onlyInRight, bothIn} = diffObject(vnode.props, olddom._vnode.props)
 setAttrs(olddom, onlyInLeft)
 removeAttrs(olddom, onlyInRight)
 diffAttrs(olddom, bothIn.left, bothIn.right)
 
-// 比较VNode与旧DOM节点的属性的 交集  差集
+// 比较 VNode 与旧 DOM 节点的属性的 交集  差集
 function diffObject(leftProps, rightProps) {
-    const onlyInLeft = {} // 只存在于新DOM节点属性的集合
-    const onlyInRight = {} // 只存在于旧DOM节点属性的集合
-    const bothLeft = {} // 共同存在的属性中新DOM节点属性的集合
-    const bothRight = {} // 共同存在的属性中旧DOM节点属性的集合
+    const onlyInLeft = {} // 只存在于新 DOM 节点属性的集合
+    const onlyInRight = {} // 只存在于旧 DOM 节点属性的集合
+    const bothLeft = {} // 共同存在的属性中新 DOM 节点属性的集合
+    const bothRight = {} // 共同存在的属性中旧 DOM 节点属性的集合
 
     for (let key in leftProps) {
         if (rightProps[key] === undefined) {
@@ -49,16 +50,16 @@ function diffObject(leftProps, rightProps) {
     }
 }
 
-// 设置DOM节点属性
+// 设置 DOM 节点属性
 function setAttrs(dom, props) {
     for (let k in props) {
-        // 属性为className时，改为class
+        // 属性为 className 时，改为 class
         if (k === 'className') {
             dom.setAttribute('class', props[k])
             continue
         }
 
-        // 属性为style时
+        // 属性为 style 时
         if (k === 'style') {
             if (typeof props[k] === 'string') {
                 dom.style.cssText = props[k]
@@ -72,7 +73,7 @@ function setAttrs(dom, props) {
             continue
         }
 
-        // 属性为on开头的绑定的事件
+        // 属性为 on 开头的绑定的事件
         if (k[0] === 'o' && k[1] === 'n') {
             dom.addEventListener(k.substring(2).toLowerCase(), props[k], false)
             continue
@@ -84,7 +85,7 @@ function setAttrs(dom, props) {
     }
 }
 
-// 去除DOM节点属性
+// 去除 DOM 节点属性
 function removeAttrs(dom, props) {
     for (let k in props) {
         if (k === 'className') {
@@ -107,7 +108,7 @@ function removeAttrs(dom, props) {
     }
 }
 
-// 修改DOM节点属性
+// 修改 DOM 节点属性
 function diffAttrs(dom, newProps, oldProps) {
     for (let k in newProps) {
         if (newProps[k] === oldProps[k]) continue
@@ -124,13 +125,13 @@ function diffAttrs(dom, newProps, oldProps) {
 
             if (typeof newProps[k] === 'object' && typeof oldProps[k] === 'object') {
                 for (let v in newProps[k]) {
-                    // 若新属性的css属性与旧属性的css属性不同，则css属性赋值为新属性的css属性
+                    // 若新属性的 css 属性与旧属性的 css 属性不同，则 css 属性赋值为新属性的 css 属性
                     if (newProps[k][v] !== oldProps[k][v]) {
                         dom.style[v] = newProps[k][v]
                     }
                 }
 
-                // 若旧属性的css属性中某个属性，在新属性的css属性中不存在，则将该css属性设置为空
+                // 若旧属性的 css 属性中某个属性，在新属性的 css 属性中不存在，则将该 css 属性设置为空
                 for (let v in oldProps[k]) {
                     if (newProps[k][v] === undefined) {
                         dom.style[v] = ''

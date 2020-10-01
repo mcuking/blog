@@ -52,13 +52,13 @@ mWebview.evaluateJavascript("javascript: func()", new ValueCallback<String>() {
 
 跳转的目的地是一个非法不存在的 URL 地址，例如：
 
-```javascript
+```js
 "jsbridge://methodName?{"data": arg, "cbName": cbName}"
 ```
 
 具体示例如下：
 
-```javascript
+```js
 "jsbridge://openScan?{"data": {"scanType": "qrCode"}, "cbName": "handleScanResult"}"
 ```
 
@@ -66,7 +66,7 @@ h5 和 native 约定一个通信协议，例如 jsbridge, 同时约定调用 nat
 
 具体可以在 js 端封装相关方法，供业务端统一调用，代码如下：
 
-```javascript
+```js
 window.callbackId = 0;
 
 function callNative(methodName, arg, cb) {
@@ -90,7 +90,7 @@ function callNative(methodName, arg, cb) {
 
 至于如何在 h5 中发起请求，可以设置 window.location.href 或者创建一个新的 iframe 进行跳转。
 
-```javascript
+```js
 function callNative(methodName, arg, cb) {
     ...
 
@@ -136,7 +136,7 @@ public class JSBridgeViewClient extends WebViewClient {
 
 如下代码：
 
-```javascript
+```js
 window.location.href = "jsbridge://callNativeNslog?{"data": "111", "cbName": ""}";
 window.location.href = "jsbridge://callNativeNslog?{"data": "222", "cbName": ""}";
 ```
@@ -145,7 +145,7 @@ js 此时的诉求是在同一个运行逻辑内，快速的连续发送出 2 �
 
 原因：因为 h5 的请求归根结底是一种模拟跳转，跳转这件事情上 webview 会有限制，当 h5 连续发送多条跳转的时候，webview 会直接过滤掉后发的跳转请求，因此第二个消息根本收不到，想要收到怎么办？js 里将第二条消息延时一下。
 
-```javascript
+```js
 //发第一条消息
 location.href = "jsbridge://callNativeNslog?{"data": "111", "cbName": ""}";
 
@@ -169,7 +169,7 @@ setTimeout(500,function(){
 
 约定的传输数据的组合方式以及 js 端封装方法的可以类似上面的 拦截 URL Schema 提到的方式。
 
-```javascript
+```js
 function callNative(methodName, arg, cb) {
     ...
 
@@ -262,7 +262,7 @@ public class JSBridge {
 
 然后 h5 端可以在 js 调用 window.\_jsbridge 实例下面的 call 方法，传入的数据组合方式可以类似上面两种方式。具体代码如下：
 
-```javascript
+```js
 window.callbackId = 0;
 
 function callNative(method, arg, cb) {
@@ -370,7 +370,7 @@ private static HashMap<String, Method> getAllMethod(Class injectedCls) {
 由于注入 JS 上下文和两外两种，h5 端传过来的参数形式不同，所以处理参数的方式略有不同。
 下面以拦截 Prompt 的方式为例进行讲解，在该方式中 call 接收的第一个参数为 webView，第二个参数是 arg，即 h5 端传过来的参数。还记得拦截 Prompt 方式时 native 端和 h5 端约定的传输数据的方式么？
 
-```javascript
+```js
 "jsbridge://openScan?{"data": {"scanType": "qrCode"}, "cbName":"handleScanResult"}"
 ```
 

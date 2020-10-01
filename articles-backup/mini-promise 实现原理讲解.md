@@ -1,27 +1,41 @@
 > 文章首发于我的博客 https://github.com/mcuking/blog/issues/72
 
-> 相关代码请查阅 https://github.com/mcuking/blog/tree/master/mini-promise
+> 实现源码请查阅 https://github.com/mcuking/blog/tree/master/mini-Promise
 
-本文主要会按照 [Promises/A+规范](https://www.ituring.com.cn/article/66566) 来一步步实现一个完整的 Promise
+本文主要是阐述如何一步步实现一个符合 [Promises/A+ 规范](https://promisesaplus.com/) 的 Promise。
 
-先写一段 Promise 的应用代码：
+## Promise 实现
+
+在实现之前，让我们先看一段使用 Promise 的示例代码：
 
 ```js
 new Promise((resolve, reject) => {
   setTimeout(resolve('hello world'), 1000);
 })
-.then((msg) => console.log(msg), (err) => console.error(err))
+.then(
+  (msg) => console.log(msg),
+  (err) => console.error(err)
+);
 ```
 
-第一步我们先实现前半部分，即：
+### Promise 实例化对象过程的实现
 
-```
+首先我们来先实现前半部分的功能，即：
+
+```js
 new Promise((resolve, reject) => {
   setTimeout(resolve('hello world'), 1000);
 })
 ```
 
-根据 Promise A+ 规范我们可以知道 Promise 本身是一个类，并且有三种状态，实例化的时候接收一个立即执行函数，并可以接受  resolve 和 reject 方法，因此可以初步写出如下代码
+根据 [Promises/A+ 规范](https://promisesaplus.com/) 我们可以分解一下需要做的事情：
+
+1. 首先采用一个类来实现 Promise；
+2. 这个类的实例有一个状态属性，来表示 Promise 对象实例的三种状态：pending、resolved、rejected；
+3. Promise 实例化对象的时候会接收一个函数，会在实例化的时候就立即执行；
+4. 上一点的立即执行函数有两个参数：resolve 方法和 reject 方法。这两个方法主要是用来改变 Promise 对象实例的状态，以及执行成功 / 失败回调函数，这个逻辑放到后面来实现。
+
+因此可以初步写出如下代码：
 
 ```js
 class Promise {
@@ -30,8 +44,8 @@ class Promise {
       throw new TypeError(`Promise resolver ${executor} is not a function`);
     }
 
-    this.value = undefined; // Promise的值
-    this.status = 'pending'; // Promise当前的状态
+    this.value = undefined; // Promise 的值
+    this.status = 'pending'; // Promise 当前的状态
 
     const resolve = value => {
       // 成功后的一系列操作（状态的改变、成功回调执行）
@@ -42,8 +56,8 @@ class Promise {
     };
 
     try {
-      // 考虑到执行executor的过程中有可能出错，所以我们用try/catch块给包起来，并且在出错后以catch到的值reject掉这个Promise
-      executor(resolve, reject); // 执行executor
+      // 考虑到执行 executor 的过程中有可能出错，所以我们用 try/catch 块给包起来，并且在出错后以 catch 到的值 reject 掉这个 Promise
+      executor(resolve, reject); // 执行 executor
     } catch (e) {
       reject(e);
     }
@@ -51,7 +65,23 @@ class Promise {
 }
 ```
 
-接下来我们来分析 then 方法的实现，then 方法会接收两个参数，依次是成功回调函数和失败回调函数，当调用 resolve 方法使 Promise 进入 resolved 状态时，则执行成功回调；调用 reject 方法使 Promise 进入 rejected 状态时，则执行失败回调。因此我们可以加入如下实现：
+接下来我们来分析如何实现第二部分 --then 方法：
+
+```js
+new Promise((resolve, reject) => {
+  setTimeout(resolve('hello world'), 1000);
+})
+.then(
+  (msg) => console.log(msg),
+  (err) => console.error(err)
+);
+```
+
+根据 [Promises/A+ 规范](https://promisesaplus.com/) ，then 方法会接收两个参数，分别是成功和失败的回调函数。当调用 resolve 方法将 Promise 状态从 pending 改为 resolved，并执行传入的成功回调函数；调用 reject 方法将 Promise 状态从 pending 改为 rejected，并执行失败回调函数。
+
+需要注意的是，一个 Promise 实例对象的 then 方法会被调用多次，也就说 then 方法可以接收多个成功 / 失败回调函数，所以需要使用数组来接收这些回调函数。当 Promise 实例对象的状态从 pending 变成 resovled/rejected 时，就遍历存储回调函数的数组执行所有的成功 / 失败回调函数。
+
+下面是对应的实现代码：
 
 ```js
 class Promise {
@@ -60,36 +90,36 @@ class Promise {
       throw new TypeError(`Promise resolver ${executor} is not a function`);
     }
 
-    this.value = undefined; // Promise的值
-    this.status = 'pending'; // Promise当前的状态
-    this.onResolvedCallback = []; // Promise resolve时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
-    this.onRejectedCallback = []; // Promise reject时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
+    this.value = undefined; // Promise 的值
+    this.status = 'pending'; // Promise 当前的状态
+    this.onResolvedCallbacks = []; // Promise resolve 时的回调函数集，因为在 Promise 结束之前有可能有多个回调添加到它上面
+    this.onRejectedCallbacks = []; // Promise reject 时的回调函数集，因为在 Promise 结束之前有可能有多个回调添加到它上面
 
     const resolve = value => {
-      // 当前状态为pending时才会执行
+      // 当前状态为 pending 时才会执行
       if (this.status === 'pending') {
         this.status = 'resolved';
         this.value = value;
-        for (let i = 0; i < this.onResolvedCallback.length; i++) {
-          this.onResolvedCallback[i](value);
+        for (let i = 0; i < this.onResolvedCallbacks.length; i++) {
+          this.onResolvedCallbacks[i](value);
         }
       }
     };
 
     const reject = reason => {
-      // 当前状态为pending时才会执行
+      // 当前状态为 pending 时才会执行
       if (this.status === 'pending') {
         this.status = 'rejected';
         this.value = reason;
-        for (let i = 0; i < this.onRejectedCallback.length; i++) {
-          this.onRejectedCallback[i](reason);
+        for (let i = 0; i < this.onRejectedCallbacks.length; i++) {
+          this.onRejectedCallbacks[i](reason);
         }
       }
     };
 
     try {
-      // 考虑到执行executor的过程中有可能出错，所以我们用try/catch块给包起来，并且在出错后以catch到的值reject掉这个Promise
-      executor(resolve, reject); // 执行executor
+      // 考虑到执行 executor 的过程中有可能出错，所以我们用 try/catch 块给包起来，并且在出错后以 catch 到的值 reject 掉这个 Promise
+      executor(resolve, reject); // 执行 executor
     } catch (e) {
       reject(e);
     }
@@ -97,31 +127,31 @@ class Promise {
 }
 ```
 
-这里需要注意两点：
+### Promise 对象实例的 then 方法的实现
 
-- 为什么 onResolvedCallback 和 onRejectedCallback 是数组？
+从上面的实现中，读者可能会有一个疑问：**执行 resolve 和 reject 方法时，为什么会需要先判断当前 Promise 实例对象状态是否为 pending。如果是 pending，才会遍历执行回调函数数组中的回调函数呢？**
 
-因为 then 方法可以被同一个 promise 调用多次，因此可能会传入多个成功或失败回调函数。
+**因为当 Promise 实例对象已经处于 resolved 或 rejected 状态时，传入的对应回调函数时就需要被立即执行，并且只会被执行一次。再次调用 resolve 或 reject 方法不会再做任何操作。**
 
-- resolve 和 reject 为什么会首先判断当前状态是否为 pending？
+例如当 Promise 实例已经处于 resolved 状态时，调用 then 方法接收成功回调函数时，该函数会被立即执行。同理处于 rejected 状态时，会立即执行 then 方法接收的失败回调函数。
 
-因为当 Promise 实例已经处于 resolved 或 rejected 状态时，传入的对应回调函数会被立即执行。即当 Promise 实例已经处于 resolved 状态时，调用 then 传入成功回调函数时，回调会被立即执行。同理处于 rejected 状态时会立即执行失败回调函数。
+另外需要明确的一点是，根据 [Promises/A+ 规范](https://promisesaplus.com/)，then 方法必须返回一个 Promise 对象，因此执行完 then 方法后，需要再返回一个新的 Promise 实例。
 
-下面我们就来增加下这个逻辑，另外需要明确的一点是，根据 Promise A+ 规范：then 方法必须返回一个 promise 对象，因此执行完 then 方法后，需要返回一个新的 Promise 实例。
+那么我们就来根据刚才的分析来实现一下 then 方法。下面对应的实现代码：
 
 ```js
-// 增加then方法
+// 增加 then 方法
 class Promise {
   constructor(executor) {
-       同上
+    // 代码同上
   }
 
-  // then方法接收两个参数，onResolved，onRejected，分别为Promise成功或失败后的回调
+  // then 方法接收两个参数，onResolved，onRejected，分别为 Promise 成功或失败后的回调
   then(onResolved, onRejected) {
     let self = this;
     let promise2;
 
-    // 根据标准，如果then的参数不是function，则我们需要忽略它，此处以如下方式处理
+    // 根据标准，如果 then 的参数不是 function，则我们需要忽略它，此处以如下方式处理
     onResolved = typeof onResolved === 'function' ? onResolved : function(v) {};
     onRejected = typeof onRejected === 'function' ? onRejected : function(r) {};
 
@@ -139,10 +169,10 @@ class Promise {
 
     if (self.status === 'pending') {
       return (promise2 = new Promise(function(resolve, reject) {
-        self.onResolvedCallback.push(function(value) {
+        self.onResolvedCallbacks.push(function(value) {
           onResolved(value);
         });
-        self.onRejectedCallback.push(function(reason) {
+        self.onRejectedCallbacks.push(function(reason) {
           onRejected(reason);
         });
       }));
@@ -150,63 +180,69 @@ class Promise {
   }
 }
 ```
- 
-其中当前 promise1 处于 pending 状态时，执行 then 方法时返回一个 promise2 的同时，在 promise2 的立即执行函数中将回调函数塞入 promise1 的回调队列中；当处于 resolved 时，则在返回的 promise2 中的立即执行函数中执行传入的成功回调；处于 rejeted 状态同理。
 
-### 链式调用-回调函数返回值问题
+- 当前 promise1 处于 pending 状态时，执行 then 方法时返回一个 promise2 的同时，在 promise2 对应的立即执行函数中将接收到的回调函数塞入 promise1 的回调队列中；
 
-根据 Promise A+ 规范：
+- 当处于 resolved 时，则在返回的 promise2 对应的立即执行函数中调用传入的成功回调函数；
+
+- 当处于 rejeted 时，则在返回的 promise2 对应的立即执行函数中调用传入的失败回调函数。
+
+这里读者可能会有一个疑问，为什么需要在 promise2 对应的立即执行函数中执行塞入回调函数到队列或立即执行回调函数的逻辑？直接在外面执行这些逻辑不就可以了么？这就涉及到了下个要实现的功能了 --Promise 链式调用
+
+### Promise 链式调用 - 回调函数返回值问题
+
+根据 [Promises/A+ 规范](https://promisesaplus.com/) ：
 
 ```js
-promise2 = promise1.then(onFulfilled, onRejected);   
+promise2 = promise1.then(onFulfilled, onRejected);
 ```
 
 如果 onFulfilled 或者 onRejected 返回一个值 x ，则运行下面的 Promise 解决过程：`[[Resolve]](promise2, x)`。具体规则如下：
 
 ![image](https://user-images.githubusercontent.com/22924912/72674087-c2ca1c00-3aad-11ea-93c4-76a3db956d7c.png)
 
-这里我们只考虑  x 为 promise 或非对象和函数的值的情况：
+这里我们只考虑 x 为 Promise 或非对象和函数的值的情况：
 
-如果 onResolved/onRejected 的返回值 x 是一个 Promise 对象，直接取它的结果做为 promise2 的结果，即 x 接管了 promise2 的状态：如果 x 处于等待态， promise2 需保持为等待态直至 x 被执行或拒绝，如果 x 处于执行态，用相同的值执行 promise2，如果 x 处于拒绝态，用相同的据因拒绝 promise2。
+**如果 onResolved/onRejected 的返回值 x 是一个 Promise 对象，直接取它的结果做为 promise2 的结果，即 x 接管了 promise2 的状态：如果 x 处于 pending 状态， promise2 需保持为 pending 状态直至 x 被 resolve/reject 掉，如果 x 处于 resolved 状态，用相同的 value 执行 promise2，如果 x 处于 rejected 状态，用相同的 reason 拒绝 promise2。**
 
-如果 x 不为对象或者函数，以 x 为参数执行 promise2。
+**如果 x 不为对象或者函数，则以 x 为参数执行 promise2。**
 
-下面为具体实现：
+下面是对应的实现代码：
 
 ```js
-// 针对上一个Promise为pending时，上一个then返回值进行优化
+// 针对上一个 Promise 为 pending 时，上一个 then 返回值进行优化
 class Promise {
   constructor(executor) {
-       同上
+    // 同上
   }
 
-  // then方法接收两个参数，onResolved，onRejected，分别为Promise成功或失败后的回调
+  // then 方法接收两个参数，onResolved，onRejected，分别为 Promise 成功或失败后的回调
   then(onResolved, onRejected) {
     let self = this;
     let promise2;
 
-    // 根据标准，如果then的参数不是function，则我们需要忽略它，此处以如下方式处理
+    // 根据标准，如果 then 的参数不是 function，则我们需要忽略它，此处以如下方式处理
     onResolved = typeof onResolved === 'function' ? onResolved : function(v) {};
     onRejected = typeof onRejected === 'function' ? onRejected : function(r) {};
 
     if (self.status === 'resolved') {
-      // 如果promise1(此处即为this/self)的状态已经确定并且是resolved，我们调用onResolved
-      // 因为考虑到有可能throw，所以我们将其包在try/catch块里
+      // 如果 promise1(此处即为 this/self) 的状态已经确定并且是 resolved，我们调用 onResolved
+      // 因为考虑到有可能 throw，所以我们将其包在 try/catch 块里
       return (promise2 = new Promise(function(resolve, reject) {
         try {
           let x = onResolved(self.value);
           if (x instanceof Promise) {
-            // 如果onResolved的返回值是一个Promise对象，直接取它的结果做为promise2的结果
+            // 如果 onResolved 的返回值是一个 Promise 对象，直接取它的结果做为 promise2 的结果
             x.then(resolve, reject);
           }
-          resolve(x); // 否则，以它的返回值做为promise2的结果
+          resolve(x); // 否则，以它的返回值做为 promise2 的结果
         } catch (e) {
-          reject(e); // 如果出错，以捕获到的错误做为promise2的结果
+          reject(e); // 如果出错，以捕获到的错误做为 promise2 的结果
         }
       }));
     }
 
-    // 此处与前一个if块的逻辑几乎相同，区别在于所调用的是onRejected函数，就不再做过多解释
+    // 此处与前一个 if 块的逻辑几乎相同，区别在于所调用的是 onRejected 函数，就不再做过多解释
     if (self.status === 'rejected') {
       return (promise2 = new Promise(function(resolve, reject) {
         try {
@@ -214,7 +250,7 @@ class Promise {
           if (x instanceof Promise) {
             x.then(resolve, reject);
           }
-          reject(x); // 否则，以它的返回值做为promise2的结果
+          reject(x); // 否则，以它的返回值做为 promise2 的结果
         } catch (e) {
           reject(e);
         }
@@ -222,12 +258,12 @@ class Promise {
     }
 
     if (self.status === 'pending') {
-      // 如果当前的Promise还处于pending状态，我们并不能确定调用onResolved还是onRejected，
-      // 只能等到Promise的状态确定后，才能确实如何处理。
-      // 所以我们需要把我们的**两种情况**的处理逻辑做为callback放入promise1(此处即this/self)的回调数组里
-      // 逻辑本身跟第一个if块内的几乎一致，此处不做过多解释
+      // 如果当前的 Promise 还处于 pending 状态，我们并不能确定调用 onResolved 还是 onRejected，
+      // 只能等到 Promise 的状态确定后，才能确实如何处理。
+      // 所以我们需要把我们的两种情况的处理逻辑做为 callback 放入 promise1(此处即 this/self) 的回调队列里
+      // 逻辑本身跟第一个 if 块内的几乎一致，此处不做过多解释
       return (promise2 = new Promise(function(resolve, reject) {
-        self.onResolvedCallback.push(function(value) {
+        self.onResolvedCallbacks.push(function(value) {
           try {
             let x = onResolved(value);
             if (x instanceof Promise) {
@@ -238,7 +274,7 @@ class Promise {
           }
         });
 
-        self.onRejectedCallback.push(function(reason) {
+        self.onRejectedCallbacks.push(function(reason) {
           try {
             let x = onRejected(reason);
             if (x instanceof Promise) {
@@ -254,7 +290,7 @@ class Promise {
 }
 ```
 
-### 值透传问题
+### Promise 链式调用 - 值透传问题
 
 ```js
 new Promise(resolve => {
@@ -264,7 +300,7 @@ new Promise(resolve => {
   .then()
   .then((value) => console.log(value))
 ```
-当中间并没有回调函数传递时，仍能够将值传递到最后面的回调函数，因此需要对 then 方法接收的回调函数作如下操作，即默认函数中将接收的值返回给下一个 Promise：
+从上面的 Promise 使用示例代码中，我们会发现一个场景：在 Promise 链式调用中，当中间的 then 方法没有接收到回调函数时，后面的 then 方法接收的回调函数仍能够获取到前面传递的值。那么这里就需要 then 方法在接收的回调函数作如下操作，即如果没有传入成功 / 失败回调函数时，默认的回调函数需要将接收的值返回给下一个 Promise 实例对象。下面是对应的实现代码：
 
 ```js
 then(onResolved, onRejected) {
@@ -287,3 +323,143 @@ then(onResolved, onRejected) {
     ......
 }
 ```
+
+## 结束语
+
+到这里一个基本的 Promise 已经实现了，下面是完整的 Promise 代码实现。经历了整个过程，相信读者对 Promise 的理解会更加深入了。
+
+```js
+class Promise {
+  constructor(executor) {
+    if (typeof executor !== 'function') {
+      throw new TypeError(`Promise resolver ${executor} is not a function`);
+    }
+
+    this.value = undefined; // Promise 的值
+    this.status = 'pending'; // Promise 当前的状态
+    this.onResolvedCallback = []; // Promise resolve 时的回调函数集，因为在 Promise 结束之前有可能有多个回调添加到它上面
+    this.onRejectedCallback = []; // Promise reject 时的回调函数集，因为在 Promise 结束之前有可能有多个回调添加到它上面
+
+    const resolve = value => {
+      if (this.status === 'pending') {
+        this.status = 'resolved';
+        this.value = value;
+        for (let i = 0; i < this.onResolvedCallback.length; i++) {
+          this.onResolvedCallback[i](value);
+        }
+      }
+    };
+
+    const reject = reason => {
+      if (this.status === 'pending') {
+        this.status = 'rejected';
+        this.value = reason;
+        for (let i = 0; i < this.onRejectedCallback.length; i++) {
+          this.onRejectedCallback[i](reason);
+        }
+      }
+    };
+
+    try {
+      // 考虑到执行 executor 的过程中有可能出错，所以我们用 try/catch 块给包起来，并且在出错后以 catch 到的值 reject 掉这个 Promise
+      executor(resolve, reject); // 执行 executor
+    } catch (e) {
+      reject(e);
+    }
+  }
+
+  // then 方法接收两个参数，onResolved，onRejected，分别为 Promise 成功或失败后的回调
+  then(onResolved, onRejected) {
+    let self = this;
+    let promise2;
+
+    // 增加值的透传功能
+    onResolved =
+      typeof onResolved === 'function'
+        ? onResolved
+        : function(value) {
+            return value;
+          };
+    onRejected =
+      typeof onRejected === 'function'
+        ? onRejected
+        : function(reason) {
+            throw reason;
+          };
+
+    if (self.status === 'resolved') {
+      // 如果 promise1(此处即为 this/self) 的状态已经确定并且是 resolved，我们调用 onResolved
+      // 因为考虑到有可能 throw，所以我们将其包在 try/catch 块里
+      return (promise2 = new Promise(function(resolve, reject) {
+        try {
+          let x = onResolved(self.value);
+          if (x instanceof Promise) {
+            // 如果 onResolved 的返回值是一个 Promise 对象，直接取它的结果做为 promise2 的结果
+            x.then(resolve, reject);
+          } else {
+            resolve(x); // 否则，以它的返回值做为 promise2 的结果
+          }
+        } catch (e) {
+          reject(e); // 如果出错，以捕获到的错误做为 promise2 的结果
+        }
+      }));
+    }
+
+    // 此处与前一个 if 块的逻辑几乎相同，区别在于所调用的是 onRejected 函数，就不再做过多解释
+    if (self.status === 'rejected') {
+      return (promise2 = new Promise(function(resolve, reject) {
+        try {
+          let x = onRejected(self.value);
+          if (x instanceof Promise) {
+            x.then(resolve, reject);
+          } else {
+            reject(x); // 否则，以它的返回值做为 promise2 的结果
+          }
+        } catch (e) {
+          reject(e);
+        }
+      }));
+    }
+
+    if (self.status === 'pending') {
+      // 如果当前的 Promise 还处于 pending 状态，我们并不能确定调用 onResolved 还是 onRejected，
+      // 只能等到 Promise 的状态确定后，才能确实如何处理。
+      // 所以我们需要把我们的两种情况的处理逻辑做为 callback 放入 promise1(此处即 this/self) 的回调队列里
+      // 逻辑本身跟第一个 if 块内的几乎一致，此处不做过多解释
+      return (promise2 = new Promise(function(resolve, reject) {
+        self.onResolvedCallback.push(function(value) {
+          try {
+            let x = onResolved(value);
+            if (x instanceof Promise) {
+              x.then(resolve, reject);
+            } else {
+              resolve(x);
+            }
+          } catch (e) {
+            reject(e);
+          }
+        });
+
+        self.onRejectedCallback.push(function(reason) {
+          try {
+            let x = onRejected(reason);
+            if (x instanceof Promise) {
+              x.then(resolve, reject);
+            } else {
+              reject(x);
+            }
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }));
+    }
+  }
+}
+```
+
+## 参考资料
+
+- [Promises/A+ 规范](https://promisesaplus.com/)
+
+- [Promises/A+ 规范（译）](https://www.ituring.com.cn/article/66566)

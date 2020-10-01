@@ -5,7 +5,7 @@
 
 ![image](https://user-images.githubusercontent.com/22924912/72984163-04482780-3e1e-11ea-9b8c-2047a46c5383.png)
 
-### 构建准备阶段
+## 构建准备阶段
 
 回顾前面的文章，在 webpack-cli 重新调用 webpack 包时，首先执行的就是 node_module\webpack\lib\webpack.js 中的函数。如下：
 
@@ -155,7 +155,7 @@ module.exports = class EntryOptionPlugin {
 
 接下来则是调用了 compiler 的 run 方法，那么我们就回到 Compiler 文件中，进一步分析 Compiler 中到底做了哪些事情。
 
-### 模块构建和 chunk 生成阶段
+## 模块构建和 chunk 生成阶段
 
 下面就是 Compiler 类的关键代码：
 
@@ -281,11 +281,11 @@ class Compiler extends Tapable {
 
 - Compilation 类（`./lib/Compilation.js`）：代表了一次单一的版本构建和生成资源。compilation 编译作业可以多次执行，比如 webpack 工作在 watch 模式下，每次监测到源文件发生变化时，都会重新实例化一个 compilation 对象。一个 compilation 对象表现了当前的模块资源、编译生成资源、变化的文件、以及被跟踪依赖的状态信息。
 
-#### Compiler 和 Compilation 区别？
+### Compiler 和 Compilation 区别？
 
 compiler 代表的是不变的 webpack 环境； compilation 代表的是一次编译作业，每一次的编译都可能不同。
 
-#### compiler.run()
+### compiler.run()
 
 单独截取 run 方法如下：
 
@@ -324,7 +324,7 @@ run(callback) {
 
 在 run 函数里，首先触发了一些钩子：`beforeRun --> run --> done`，并在触发 run 钩子的时候，执行了 this.compile 方法。那么我们就去看下这个 compile 方法具体做了些什么。
 
-#### compiler.compile()
+### compiler.compile()
 
 首先截取 compile() 方法关键代码：
 
@@ -489,4 +489,4 @@ nomalModule.doBuild 方法又调用了 runLoaders 方法来调用对应的 loade
 const result = this.parser.parse(source);
 ```
 
-### 文件生成阶段
+## 文件生成阶段

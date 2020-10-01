@@ -2,26 +2,30 @@
 
 > 相关代码请查阅 https://github.com/mcuking/blog/tree/master/mini-react
 
-# 支持JSX
-可以通过 [babel](http://babeljs.io/) 实现将JSX转化为原生js，例如
-```javascript
+## 支持 JSX
+
+可以通过 [babel](http://babeljs.io/) 实现将 JSX 转化为原生 js，例如：
+
+```js
 const hw = <div>Hello World</div>
 
 const hw = React.createElement('div', null, "Hello World")
 ```
-以上两行是等效的，所以本项目无需关心JSX语法
+以上两行是等效的，所以本项目无需关心 JSX 语法
 
-# virtual-dom
-react中virtual-dom的概念，即使用一个js对象——vnode来描述DOM节点，然后根据vnode进行实际操作DOM节点，从而渲染出DOM树。
-其中，vnode对象有3个属性：
+## virtual-dom
 
-- nodeName： 可能是某个字符串，或html标签，抑或是某个函数
+react 中 virtual-dom 的概念，即使用一个 js 对象——vnode 来描述 DOM 节点，然后根据 vnode 进行实际操作 DOM 节点，从而渲染出 DOM 树。
+其中，vnode 对象有 3 个属性：
+
+- nodeName： 可能是某个字符串，或 html 标签，抑或是某个函数
 - props
 - children
 
-以下就是如何通过createElement函数，从JSX转化后的代码中生成我们所要的vnode
-```javascript
-// 负责生成vnode
+以下就是如何通过 createElement 函数，从 JSX 转化后的代码中生成我们所要的 vnode：
+
+```js
+// 负责生成 vnode
 export default function createElement(comp, props, ...args) {
     let children = []
     for (let i = 0; i < args.length; i++) {
@@ -39,9 +43,9 @@ export default function createElement(comp, props, ...args) {
 }
 ```
 
-# 从virtual-dom到实际渲染
-以下是我们使用react写的一个组件
-```javascript
+## 从 virtual-dom 到实际渲染
+以下是我们使用 react 写的一个组件
+```js
 class Animal extends Component {
     render() {
         return (
@@ -67,15 +71,15 @@ class Cat extends Component {
 }
 render(<Animal/>, document.getElementById('container'))
 ```
-最终会渲染为i am a cat
-渲染过程是：渲染Animal的Vnode -> 渲染Pet的Vnode -> 渲染Cat的Vnode
-这是一个递归的过程：递归的终止条件是——渲染html标签：
+最终会渲染为 i am a cat
+渲染过程是：渲染 Animal 的 Vnode -> 渲染 Pet 的 Vnode -> 渲染 Cat 的 Vnode
+这是一个递归的过程：递归的终止条件是——渲染 html 标签：
 
-- 当nodeName为html标签时，直接操作dom
-- 当nodeName为组件时，通过 递归 操作组件执行render方法返回的vnode
+- 当 nodeName 为 html 标签时，直接操作 dom
+- 当 nodeName 为组件时，通过 递归 操作组件执行 render 方法返回的 vnode
 
 代码如下：
-```javascript
+```js
 function render(vnode, parent) {
     let dom
     if(typeof vnode == "string") {
@@ -91,23 +95,23 @@ function render(vnode, parent) {
         }
     } else if (typeof vnode.nodeName == "function") {
         let func = vnode.nodeName
-        
+
         let inst = new func(vnode.props)
         let innerVnode = inst.render()
         render(innerVnode, parent)
     }
 }
 
-// 设置DOM节点属性
+// 设置 DOM 节点属性
 function setAttrs(dom, props) {
     for (let k in props) {
-        // 属性为className时，改为class
+        // 属性为 className 时，改为 class
         if (k === 'className') {
             dom.setAttribute('class', props[k])
             continue
         }
 
-        // 属性为style时
+        // 属性为 style 时
         if (k === 'style') {
             if (typeof props[k] === 'string') {
                 dom.style.cssText = props[k]
@@ -121,7 +125,7 @@ function setAttrs(dom, props) {
             continue
         }
 
-        // 属性为on开头的绑定的事件
+        // 属性为 on 开头的绑定的事件
         if (k[0] === 'o' && k[1] === 'n') {
             dom.addEventListener(k.substring(2).toLowerCase(), props[k], false)
             continue
@@ -137,11 +141,11 @@ function setAttrs(dom, props) {
 总结一下：
 
 1. createElement —— 负责创建 vnode
-2. render —— 是根据生成的vnode， 渲染到实际的dom的一个递归方法
+2. render —— 是根据生成的 vnode， 渲染到实际的 dom 的一个递归方法
 
-  - 当vnode是字符串时， 创建textNode节点
-  - 当vnode.nodeName是字符串的时， 创建dom节点， 根据props设置节点属性， 遍历render children
-  - 当vnode.nodeName是函数的时， 获取render方法的返回值vnode， 执行render(vnode)
+  - 当 vnode 是字符串时， 创建 textNode 节点
+  - 当 vnode.nodeName 是字符串的时， 创建 dom 节点， 根据 props 设置节点属性， 遍历 render children
+  - 当 vnode.nodeName 是函数的时， 获取 render 方法的返回值 vnode， 执行 render(vnode)
 
 相关文章
 - [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
