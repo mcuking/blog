@@ -15,7 +15,7 @@ const hw = React.createElement('div', null, "Hello World")
 
 ## virtual-dom
 
-react 中 virtual-dom 的概念，即使用一个 js 对象——vnode 来描述 DOM 节点，然后根据 vnode 进行实际操作 DOM 节点，从而渲染出 DOM 树。
+react 中 virtual-dom 的概念，即使用一个 js 对象 — vnode 来描述 DOM 节点，然后根据 vnode 进行实际操作 DOM 节点，从而渲染出 DOM 树。
 其中，vnode 对象有 3 个属性：
 
 - nodeName： 可能是某个字符串，或 html 标签，抑或是某个函数
@@ -73,7 +73,7 @@ render(<Animal/>, document.getElementById('container'))
 ```
 最终会渲染为 i am a cat
 渲染过程是：渲染 Animal 的 Vnode -> 渲染 Pet 的 Vnode -> 渲染 Cat 的 Vnode
-这是一个递归的过程：递归的终止条件是——渲染 html 标签：
+这是一个递归的过程：递归的终止条件是 — 渲染 html 标签：
 
 - 当 nodeName 为 html 标签时，直接操作 dom
 - 当 nodeName 为组件时，通过 递归 操作组件执行 render 方法返回的 vnode
@@ -140,14 +140,15 @@ function setAttrs(dom, props) {
 
 总结一下：
 
-1. createElement —— 负责创建 vnode
-2. render —— 是根据生成的 vnode， 渲染到实际的 dom 的一个递归方法
+1. createElement — 负责创建 vnode
+2. render — 是根据生成的 vnode， 渲染到实际的 dom 的一个递归方法
 
   - 当 vnode 是字符串时， 创建 textNode 节点
   - 当 vnode.nodeName 是字符串的时， 创建 dom 节点， 根据 props 设置节点属性， 遍历 render children
   - 当 vnode.nodeName 是函数的时， 获取 render 方法的返回值 vnode， 执行 render(vnode)
 
-相关文章
+## 相关文章
+
 - [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
 - [mini-react 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/21)
 - [mini-react 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/22)

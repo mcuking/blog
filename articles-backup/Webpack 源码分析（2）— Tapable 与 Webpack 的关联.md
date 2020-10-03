@@ -1,6 +1,6 @@
 > 文章首发于我的博客 https://github.com/mcuking/blog/issues/79
 
-接着上文 [Webpack  源码分析（1）—— Webpack 启动过程分析](https://github.com/mcuking/blog/issues/78) 我们接下来继续分析 webpack 的构建流程。
+接着上文 [Webpack  源码分析（1）— Webpack 启动过程分析](https://github.com/mcuking/blog/issues/78) 我们接下来继续分析 webpack 的构建流程。
 
 上文结尾处我们提到了 webpack-cli 最终还是调用了 webpack 提供的 webpack 函数，获得了 compiler 实例对象。那么我们就重新回到 webpack 包查看下这个 webpack 函数，webpack 函数所在文件是 `node_module\webpack\lib\webpack.js` 。下面是其中的关键代码：
 
@@ -254,3 +254,13 @@ compiler.run();
 即初始化了一个 Compiler 实例对象，然后初始化了 options 里面的插件（传入Compiler 的实例对象），其实就是将插件里面的要执行的业务逻辑绑定到 Compiler 实例的 hook （钩子）上，最后执行 Compiler 实例对象的 run 方法，触发相应的 hook （钩子），从而触发绑定到 hook （钩子）上的方法的执行，本质上就是发布订阅模式。
 
 到这里我们就已经掌握了 webpack 是如何利用 tapable 来实现整个插件机制的，下篇文章我们将真正开始对 webpack 的构建流程进行解析。
+
+## 相关文章
+
+- [Webpack 源码分析（1）— Webpack 启动过程分析
+](https://github.com/mcuking/blog/issues/78)
+
+- [Webpack 源码分析（2）— Tapable 与 Webpack 的关联
+](https://github.com/mcuking/blog/issues/79)
+
+- [Webpack 源码分析（3）— Webpack 构建流程分析](https://github.com/mcuking/blog/issues/80)

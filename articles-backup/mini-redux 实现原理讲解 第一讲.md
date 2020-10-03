@@ -94,7 +94,8 @@ store.dispatch({type: '买一套房'})
 接下来我们将在此基础上，实现 react-redux 功能，以便在 react 中更优雅的使用 redux 进行全局状态管理。
 
 
-相关文章如下：
+## 相关文章
+
 - [mini-redux 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/25)
 - [mini-redux 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/26)
 - [mini-redux 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/27)

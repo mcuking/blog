@@ -79,7 +79,8 @@ else if(typeof vnode.nodeName == "string") {
 
 在后面的两讲中我将分别介绍更新属性以及复用子节点这两种机制。
 
-相关文章
+## 相关文章
+
 - [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
 - [mini-react 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/21)
 - [mini-react 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/22)

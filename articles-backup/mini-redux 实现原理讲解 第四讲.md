@@ -137,7 +137,7 @@ dispatch(action) = thunk(arrThunk(midApi)(store.dispatch)(action))
 
 至此，我们的 mini-redux 就开发完成咯，有任何问题或意见欢迎联系我。
 
-相关文章如下：
+## 相关文章
 
 * [mini-redux 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/25)
 * [mini-redux 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/26)

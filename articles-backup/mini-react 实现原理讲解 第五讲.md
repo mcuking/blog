@@ -135,7 +135,8 @@ f([{key: 'wca'}, {key: 'wcb'}, {key: 'wcc'}]) = [{key:'spanhi'}, {key: 'wca'}, {
 由于通过 key 复用子节点实现略复杂，暂时搁置。
 
 
-相关文章
+## 相关文章
+
 - [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
 - [mini-react 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/21)
 - [mini-react 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/22)

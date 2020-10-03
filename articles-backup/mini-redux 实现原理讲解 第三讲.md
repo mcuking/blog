@@ -39,11 +39,11 @@ const store = createStore(counter, applyMiddleware(thunk))
 ```
 有上面的代码可以看出，我们需要做三件事情
 
-- 第一步  对 createStore 函数进行扩展，使其能够接收第二个参数——中间件
+- 第一步  对 createStore 函数进行扩展，使其能够接收第二个参数 — 中间件
 
 - 第二步  定义 applyMiddleware 函数，使其能够将一个中间件加入到 redux 中
 
-- 第三步  实现一个中间件——redux-thunk
+- 第三步  实现一个中间件—redux-thunk
 
 ### 对 createStore 函数进行扩展
 
@@ -171,7 +171,8 @@ const thunk = ({dispatch, getState}) => next => action => {
 
 这样我们就可以通过 redux-thunk 中间件，实现了增强版的 dispatch 可以接收函数作为参数，而我们在函数里面进行异步操作，异步操作完成后用原生 dispatch 发出 action，从而实现了 redux 的异步操作全局状态的功能。
 
-相关文章如下：
+## 相关文章
+
 - [mini-redux 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/25)
 - [mini-redux 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/26)
 - [mini-redux 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/27)

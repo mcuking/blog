@@ -174,7 +174,8 @@ function render (vnode, parent, comp, olddom) {
 
 render 方法负责把 vnode 渲染到实际的 DOM， 如果组件渲染的 DOM 已经存在就替换， 并且保持一个完整的 __rendered 的引用链
 
-相关文章
+## 相关文章
+
 - [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
 - [mini-react 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/21)
 - [mini-react 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/22)

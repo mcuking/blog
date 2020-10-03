@@ -240,7 +240,8 @@ store.subscribe(() => this.update())
 
 从而，每当全局状态发生变化，都会重新获取最新的传入组件的状态和方法，实现组件状态与全局状态同步的效果。
 
-相关文章如下：
+## 相关文章
+
 - [mini-redux 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/25)
 - [mini-redux 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/26)
 - [mini-redux 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/27)

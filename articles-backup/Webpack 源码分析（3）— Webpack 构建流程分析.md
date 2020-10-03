@@ -1,13 +1,12 @@
 > 文章首发于我的博客 https://github.com/mcuking/blog/issues/80
 
-在开始分析源码之前，笔者先把之前收集到的 webpack 构建流程图贴在下面。
-后面的分析过程读者可以对照着这张图来进行理解。
+在开始分析源码之前，笔者先把之前收集到的 webpack 构建流程图贴在下面。后面的分析过程读者可以对照着这张图来进行理解。
 
-![image](https://user-images.githubusercontent.com/22924912/72984163-04482780-3e1e-11ea-9b8c-2047a46c5383.png)
+![webpack 构建流程.png](https://i.loli.net/2020/10/02/ZfHPjvO1WSApGxl.png)
 
 ## 构建准备阶段
 
-回顾前面的文章，在 webpack-cli 重新调用 webpack 包时，首先执行的就是 node_module\webpack\lib\webpack.js 中的函数。如下：
+回顾前面的文章，在 webpack-cli 重新调用 webpack 包时，首先执行的就是 `node_module/webpack/lib/webpack.js` 中的函数。如下：
 
 ```js
 const webpack = (options, callback) => {
@@ -92,7 +91,7 @@ set 方法和 process 方法都是继承自父类 OptionsDefaulter，这里就�
 }
 ```
 
-注：具体插件原理可参考上篇文章
+关于 webpack 插件机制的内容请参考上篇文章 [Webpack 源码分析（2）— Tapable 与 Webpack 的关联](https://github.com/mcuking/blog/issues/79)。
 
 最后调用了一个名为 WebpackOptionsApply 的类，我们看下其实现的部分代码：
 
@@ -151,9 +150,9 @@ module.exports = class EntryOptionPlugin {
 
 有上面代码我们可以知道 entry 可以是字符串、数组、对象和函数，其中当是数组时，则挂载 MultiEntryPlugin 插件，也就是说 webpack 会将多个文件打包成一个文件。而当是对象时，则遍历每个键值对，然后执行 itemToPlugin 方法，也就是说 webpack 会将对象中的每一项入口对应的文件分别打包成不同的文件，这个就对应到了我们常说的多页面打包场景。
 
-到这里是不是发现当看懂了源码，则会对之前死记硬背的 webpack 配置有了更深入的理解了呢？其实这就是阅读源码的一个非常棒的好处。
+到这里是不是发现当看懂了源码，就会对之前死记硬背的 webpack 配置有了更深入的理解了呢？其实这就是阅读源码的一个非常棒的好处。
 
-接下来则是调用了 compiler 的 run 方法，那么我们就回到 Compiler 文件中，进一步分析 Compiler 中到底做了哪些事情。
+接下来则是调用了 compiler 对象的 run 方法，那么我们就回到 Compiler 文件中，进一步分析 Compiler 中到底做了哪些事情。
 
 ## 模块构建和 chunk 生成阶段
 
@@ -283,7 +282,7 @@ class Compiler extends Tapable {
 
 ### Compiler 和 Compilation 区别？
 
-compiler 代表的是不变的 webpack 环境； compilation 代表的是一次编译作业，每一次的编译都可能不同。
+Compiler 代表的是不变的 webpack 环境； Compilation 代表的是一次编译作业，每一次的编译都可能不同。
 
 ### compiler.run()
 
@@ -322,11 +321,11 @@ run(callback) {
 }
 ```
 
-在 run 函数里，首先触发了一些钩子：`beforeRun --> run --> done`，并在触发 run 钩子的时候，执行了 this.compile 方法。那么我们就去看下这个 compile 方法具体做了些什么。
+在 run 函数里，首先触发了一些钩子：`beforeRun -> run -> done`，并在触发 run 钩子的时候，执行了 this.compile 方法。那么我们就去看下这个 compile 方法具体做了些什么。
 
 ### compiler.compile()
 
-首先截取 compile() 方法关键代码：
+首先截取 compile 方法关键代码：
 
 ```js
 compile(callback) {
@@ -359,7 +358,7 @@ compile(callback) {
 }
 ```
 
-代码中初始化了一个 compilation 实例对象，另外和 run 方法一些，compile 也触发一系列钩子：`beforeCompile --> compile --> make --> afterCompile`。
+代码中初始化了一个 compilation 实例对象，另外和 run 方法一些，compile 也触发一系列钩子：`beforeCompile -> compile -> make -> afterCompile`。
 
 其中根据最上面的流程图，在 make 钩子阶段，webpack 开始了真正的对模块的编译。那么我们看下到底什么逻辑订阅了 make 钩子。通过全局搜索 `hooks.make.tapAsync`，我们可以看到 SingleEntryPlugin、MultiEntryPlugin、DllEntryPlugin、DynamicEntryPlugin 等插件中都订阅了 make 钩子。
 
@@ -421,11 +420,11 @@ addEntry(context, entry, name, callback) {
 }
 ```
 
-通过上面代码我们可以看到 addEntry 有调用了 _addModuleChain，后面调用我就不在这里展示代码了，直接把调用栈列出来，感兴趣的同学可以自行查看源码。调用栈如下：
+通过上面代码我们可以看到 addEntry 又调用了 _addModuleChain，后面调用我就不在这里展示代码了，直接把调用栈列出来，感兴趣的同学可以自行查看源码。调用栈如下：
 
-`this.addEntry --> this._addModuleChain --> this.addModule --> this.buidModule --> module.build`
+`this.addEntry -> this._addModuleChain -> this.addModule -> this.buidModule -> module.build`
 
-addEntry 的作用是将模块的入口信息传递给模块链中，即 addModuleChain，随后继续调用 compiliation.factorizeModule，这些调用最后会将 entry 的入口信息”翻译“成一个模块(严格上说，模块一般是 NormalModule 实例化后的对象)。
+addEntry 的作用是将模块的入口信息传递给模块链中，即 addModuleChain，随后继续调用 compiliation.factorizeModule，这些调用最后会将 entry 的入口信息”翻译“成一个模块（严格上说，模块一般是 NormalModule 实例化后的对象）。
 
 下面是 buidModule 方法的关键代码，当 module.build 构建成功后，会调用 succeedModule 钩子，如果失败则调用 failedModule。
 
@@ -463,7 +462,7 @@ buildModule(module, optional, origin, dependencies, thisCallback) {
 
 那么 module 又是从哪里来的？从 Compilation.js 代码中我们可以知道这个是 Module 类的实例，其中又具体分为 NormalModule、ExternalModule、MutiModule、DelegatedModule 等。
 
-我们先进入到常见的 NormalModule 中查看源码（./lib/NormalModule.js）。nomalModule.build 又调用了自身的 nomalModule.doBuild 方法
+我们先进入到常见的 NormalModule 中查看源码（文件地址 `./lib/NormalModule.js`）。nomalModule.build 又调用了自身的 nomalModule.doBuild 方法
 
 ```js
 doBuild(options, compilation, resolver, fs, callback) {
@@ -483,10 +482,22 @@ doBuild(options, compilation, resolver, fs, callback) {
 
 nomalModule.doBuild 方法又调用了 runLoaders 方法来调用对应的 loader 对模块进行编译，写过 webpack loader 童鞋应该对 runLoader 比较熟悉，这个可以独立运行 webpack loader，而无需安装整个 webpack，对于调试 webpack loader 很方便，最终会通过 loader 的组合将所有模块（css，less，jpg 等）编译成标准的 js 模块。
 
-得到标准 js 模块后，在 normalModule.doBuild 方法的最后一个参数即回调函数中，又对模块进行 paser。
+得到标准 js 模块后，在 normalModule.doBuild 方法的最后一个参数即回调函数中，又对模块进行 parse。
 
 ```js
 const result = this.parser.parse(source);
 ```
 
 ## 文件生成阶段
+
+未完待续
+
+## 相关文章
+
+- [Webpack 源码分析（1）— Webpack 启动过程分析
+](https://github.com/mcuking/blog/issues/78)
+
+- [Webpack 源码分析（2）— Tapable 与 Webpack 的关联
+](https://github.com/mcuking/blog/issues/79)
+
+- [Webpack 源码分析（3）— Webpack 构建流程分析](https://github.com/mcuking/blog/issues/80)
