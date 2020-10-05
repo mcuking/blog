@@ -154,7 +154,7 @@ module.exports = class EntryOptionPlugin {
 
 接下来则是调用了 compiler 对象的 run 方法，那么我们就回到 Compiler 文件中，进一步分析 Compiler 中到底做了哪些事情。
 
-## 模块构建和 chunk 生成阶段
+## 模块构建（make）阶段
 
 下面就是 Compiler 类的关键代码：
 
@@ -426,7 +426,7 @@ addEntry(context, entry, name, callback) {
 
 addEntry 的作用是将模块的入口信息传递给模块链中，即 addModuleChain，随后继续调用 compiliation.factorizeModule，这些调用最后会将 entry 的入口信息”翻译“成一个模块（严格上说，模块一般是 NormalModule 实例化后的对象）。
 
-下面是 buidModule 方法的关键代码，当 module.build 构建成功后，会调用 succeedModule 钩子，如果失败则调用 failedModule。
+当模块开始构建时，会触发 buidModule 钩子。下面是 buidModule 方法的关键代码，其中 module.build 执行成功后，会触发 succeedModule 钩子，如果失败则触发 failedModule 钩子。
 
 ```js
 buildModule(module, optional, origin, dependencies, thisCallback) {
@@ -480,24 +480,46 @@ doBuild(options, compilation, resolver, fs, callback) {
 }
 ```
 
-nomalModule.doBuild 方法又调用了 runLoaders 方法来调用对应的 loader 对模块进行编译，写过 webpack loader 童鞋应该对 runLoader 比较熟悉，这个可以独立运行 webpack loader，而无需安装整个 webpack，对于调试 webpack loader 很方便，最终会通过 loader 的组合将所有模块（css，less，jpg 等）编译成标准的 js 模块。
+nomalModule.doBuild 方法又调用了 runLoaders 方法来调用对应的 loader 对模块进行编译，最终会通过 loader 的组合将所有模块（css，less，jpg 等）编译成标准的 js 模块。
 
-得到标准 js 模块后，在 normalModule.doBuild 方法的最后一个参数即回调函数中，又对模块进行 parse。
+写过 webpack loader 童鞋应该对 runLoader 比较熟悉，这个可以独立运行 webpack loader，而无需安装整个 webpack，对于调试 webpack loader 很方便。
+
+模块构建完成之后，在 normalModule.doBuild 方法的最后一个参数即回调函数中，会使用 [acorn](https://github.com/acornjs/acorn) 的 parse 方法将构建后的标准 js 模块内容转换成 AST 语法树，通过其中的 require 语句来找到这个模块所依赖的其他模块，然后将该模块也添加到依赖列表中，最后遍历依赖列表依次去构建。总结来说就是不断的分析模块的依赖和不断的构建模块，直到所有涉及到的模块都构建完成。
 
 ```js
+// 将 js 模块转成 AST 语法书，并分析该模块所以来的模块
 const result = this.parser.parse(source);
+...
 ```
+
+当所有模块都构建完成，会存放在 Compilation 对象的 modules 数组属性中。构建成功后会触发 succeedModule 钩子，否则会触发 failedModule 钩子。到此模块构建（make）阶段就结束了。
+
+## 优化阶段
+
+模块构建完成后，就会调用 Compilation 对象上的 seal 方法，该方法主要是触发 seal 钩子，开始对模块构建结果进行很多的优化操作，其中就包含了基于 module 生成 chunk 的逻辑。下面是 chunk 生成的算法：
+
+1. webpack 先将 entry 中对应的 module 都生成一个新的 chunk；
+   
+2. 遍历 module 的依赖列表，将依赖的 module 也加入到 chunk 中；
+
+3. 如果一个依赖的 module 是动态引入的模块（例如 require.ensure 或者 es6 中的 dynamic-import 的引入方式），那么就会根据这个 module 创建新的 chunk，并继续遍历依赖；
+   
+4. 重复上面的过程，直到得到所有的 chunks。
+
+生成 chunk 之后，接下来还会调用 Compilation.createHash 方法为文件生成 hash，例如 js 一般设置 chunkHash，css 一般设置 contentHash 等。
+
+文件 hash 创建完成之后，则会调用 createModuleAssets 方法将上个阶段构建传出来的标准 js 模块，放在 Compilation 的 assets 对象属性上去，key 是文件名，value 是构建后的模块内容。到此优化阶段就结束了。
 
 ## 文件生成阶段
 
-未完待续
+优化阶段完成之后，就会进入到文件生成阶段。主要是在 Compiler 中触发 emit 钩子，调用 compilation.getPath 获取到文件输出的目录，然后将生成的文件写到磁盘对应的目录中。
+
+到此为止，Webpack 的构建过程就完成了。经历了整个源码解读过程，相信读者对 Webpack 的理解会更加深入了。
 
 ## 相关文章
 
-- [Webpack 源码分析（1）— Webpack 启动过程分析
-](https://github.com/mcuking/blog/issues/78)
+- [Webpack 源码分析（1）— Webpack 启动过程分析](https://github.com/mcuking/blog/issues/78)
 
-- [Webpack 源码分析（2）— Tapable 与 Webpack 的关联
-](https://github.com/mcuking/blog/issues/79)
+- [Webpack 源码分析（2）— Tapable 与 Webpack 的关联](https://github.com/mcuking/blog/issues/79)
 
 - [Webpack 源码分析（3）— Webpack 构建流程分析](https://github.com/mcuking/blog/issues/80)
