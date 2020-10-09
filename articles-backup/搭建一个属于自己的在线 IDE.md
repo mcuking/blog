@@ -168,7 +168,7 @@ WORKDIR /home/app
 CMD ["npm", "run", "dev"]
 ```
 
-第二种方式是在源码中通过 yarn 下载 npm 包的命令后面添加参数 `--registry=http://npm.xxx.com` ，相关代码在 `/dependency-packager/functions/packager/dependencies/install-dependencies.ts` 文件中。
+第二种方式是在源码中通过 yarn 下载 npm 包的命令后面添加参数 `--registry=http://npm.xxx.com` ，相关代码在 [functions/packager/dependencies/install-dependencies.ts](https://github.com/codesandbox/dependency-packager/blob/master/functions/packager/dependencies/install-dependencies.ts) 文件中。
 
 另外该服务依赖了 AWS 的 Lambda 提供的 Serverless，并采用 AWS 提供的 S3 存储服务缓存 npm 包的打包结果。如果读者没有这些服务的话，可以将源码中这部分内容注释掉或者换成对应的其他云计算厂商的服务即可。[dependency-packager](https://github.com/codesandbox/dependency-packager) 本质上就是一个基于 express 框架的 node 服务，可以简单地直接跑在服务器中。
 
@@ -264,7 +264,7 @@ FROM nginx:1.16.1-alpine
 COPY --from=build /packages/app/www /usr/share/nginx/html/
 ```
 
-注意这里采用了分阶段构建镜像，即先构建 CodeSandbox 项目，再构建镜像。但在实践中发现 CodeSandbox 项目构建放在服务器上构建不是很顺利，所以最终还是选择在本地构建前端项目，然后将构建产物一并上传到远程 git 仓库，这样在打包机上只需要构建镜像并运行即可。
+注意这里采用了分阶段构建镜像，即先构建 CodeSandbox 项目，再构建镜像。但在实践中发现 CodeSandbox 项目放在服务器上构建不是很顺利，所以最终还是选择在本地构建该项目，然后将构建产物一并上传到远程 git 仓库，这样在打包机上只需要构建镜像并运行即可。
 
 整个部署的灵感来自 GitLab 的官方仓库的一个 issue: [GitLab hosted Codesandbox](https://gitlab.com/gitlab-org/gitlab/-/issues/27144)
 
@@ -282,7 +282,7 @@ COPY --from=build /packages/app/www /usr/share/nginx/html/
 
 在线 npm 打包服务一般只会返回 js 文件，所以需要在该服务基础上增加一个功能：当判断请求的 npm 包为内建组件，则还要额外返回样式文件。下面是 [dependence-packager](https://github.com/codesandbox/dependency-packager) 项目中添加的核心代码：
 
-为了提供获取私有组件样式文件的方法，可以新建一个文件 `functions/packager/utils/fetch-builtin-component-style.ts` ，核心代码如下：
+为了提供获取私有组件样式文件的方法，可以在 [functions/packager/utils](https://github.com/codesandbox/dependency-packager/tree/master/functions/packager/utils) 目录下新建一个文件 `fetch-builtin-component-style.ts` ，核心代码如下：
 
 ``` ts
 // 根据组件 npm 包名以及通过 yarn 下载到磁盘上的 npm 包路径，读入对应的样式文件内容，并写入到 manifest.json 的 contents 对象上
@@ -323,7 +323,7 @@ const fetchBuiltinComponentStyle = (
 };
 ```
 
-并在 `functions/packager/index.ts` 文件中调用该方法。代码如下：
+并在 [functions/packager/index.ts](https://github.com/codesandbox/dependency-packager/blob/master/functions/packager/index.ts) 文件中调用该方法。代码如下：
 
 ``` ts
 +  // 针对私有组件，将组件样式文件也写到返回给浏览器的 manifest.json 文件中
@@ -344,7 +344,7 @@ const response = {
 
 **浏览器 CodeSandbox 侧**
 
-浏览器 CodeSandbox 侧需要提供处理私有组件样式的方法，主要是在 Evaluation 执行阶段将样式文件内容通过 style 标签动态插入到 head 标签上面，可以新建一个文件 `packages/app/src/sandbox/eval/utils/insert-builtin-component-style.ts` ，下面是核心代码：
+浏览器 CodeSandbox 侧需要提供处理私有组件样式的方法，主要是在 Evaluation 执行阶段将样式文件内容通过 style 标签动态插入到 head 标签上面，可以在 [packages/app/src/sandbox/eval/utils](https://github.com/codesandbox/codesandbox-client/tree/master/packages/app/src/sandbox/eval/utils) 目录下新建一个文件 `insert-builtin-component-style.ts` ，下面是核心代码：
 
 ``` ts
 // 基于样式文件内容创建 style 标签，并插入到 head 标签上
@@ -376,7 +376,7 @@ const insertBuiltinComponentStyle = (manifest: any) => {
 }
 ```
 
-并在 Evaluation 执行阶段调用该方法，相关文件在 `packages/app/src/sandbox/eval/manager.ts` ，具体修改如下：
+并在 Evaluation 执行阶段调用该方法，相关文件在 [packages/sandpack-core/src/manager.ts](https://github.com/codesandbox/codesandbox-client/blob/master/packages/sandpack-core/src/manager.ts) ，具体修改如下：
 
 ``` ts
 ...
@@ -400,7 +400,7 @@ setManifest(manifest?: Manifest) {
 
 ![ide 截图功能](https://user-images.githubusercontent.com/22924912/93729298-79ab0880-fbf6-11ea-88d5-d8657ae3a247.png)
 
-右侧预览区域所展示的内容是 SandpackProvider 组件插入的 iframe，所以只需要找到这个 iframe，然后通过 postMessage 与 iframe 内页面进行通信。当 iframe 内部页面接收到截图指令后，对当前 dom 进行截图并传出即可，这里笔者用的是 html2canvas 进行截图的。下面是 CodeSandbox 侧的代码改造，文件在 `packages/app/src/sandbox/index.js` 中，主要是在文件结尾处添加如下代码：
+右侧预览区域所展示的内容是 SandpackProvider 组件插入的 iframe，所以只需要找到这个 iframe，然后通过 postMessage 与 iframe 内页面进行通信。当 iframe 内部页面接收到截图指令后，对当前 dom 进行截图并传出即可，这里笔者用的是 html2canvas 进行截图的。下面是 CodeSandbox 侧的代码改造，文件在 [packages/app/src/sandbox/index.js](https://github.com/codesandbox/codesandbox-client/blob/master/packages/app/src/sandbox/index.js) 中，主要是在文件结尾处添加如下代码：
 
 ```js
 const fetchScreenShot = async () => {
@@ -435,7 +435,7 @@ window.addEventListener('message', receiveMessageFromIndex, false);
 
 ### create-react-app 模板中添加对 less 文件编译的支持
 
-主要是对 create-react-app 这个 preset 的配置做一些修改，文件地址 `packages/app/src/sandbox/eval/presets/create-react-app/v1.ts`。修改代码如下：
+主要是对 create-react-app 这个 preset 的配置做一些修改，文件地址 [packages/app/src/sandbox/eval/presets/create-react-app/v1.ts](https://github.com/codesandbox/codesandbox-client/blob/master/packages/app/src/sandbox/eval/presets/create-react-app/v1.ts)。修改代码如下：
 
 ```ts
 ...
@@ -458,7 +458,7 @@ export default function initialize() {
 
 ### 修改 CodeSandbox 请求的 npm 打包服务地址
 
-可以将打包 npm 的服务换成上面私有化部署的服务，以解决无法获取私有 npm 包等问题。相关文件在 `packages/app/src/sandbox/npm/fetch-dependencies.ts` 。修改代码如下：
+可以将打包 npm 的服务换成上面私有化部署的服务，以解决无法获取私有 npm 包等问题。相关文件在 [packages/sandpack-core/src/npm/preloaded/fetch-dependencies.ts](https://github.com/codesandbox/codesandbox-client/blob/master/packages/sandpack-core/src/npm/preloaded/fetch-dependencies.ts) 。修改代码如下：
 
 ``` ts
  const PROD_URLS = {
