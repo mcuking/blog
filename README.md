@@ -29,14 +29,9 @@
 
 ### 迷你系列
 
-- [mini-react 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/20)
-- [mini-react 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/21)
-- [mini-react 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/22)
-- [mini-react 实现原理讲解 第四讲](https://github.com/mcuking/blog/issues/23)
-- [mini-react 实现原理讲解 第五讲](https://github.com/mcuking/blog/issues/24)
+- [mini-pack 实现原理讲解](https://github.com/mcuking/blog/issues/77)
+- [mini-promise 实现原理讲解](https://github.com/mcuking/blog/issues/72)
 - [mini-redux 实现原理讲解 第一讲](https://github.com/mcuking/blog/issues/25)
 - [mini-redux 实现原理讲解 第二讲](https://github.com/mcuking/blog/issues/26)
 - [mini-redux 实现原理讲解 第三讲](https://github.com/mcuking/blog/issues/27)
 - [mini-redux 实现原理讲解 第四讲](https://github.com/mcuking/blog/issues/29)
-- [mini-pack 实现原理讲解](https://github.com/mcuking/blog/issues/77)
-- [mini-promise 实现原理讲解](https://github.com/mcuking/blog/issues/72)
