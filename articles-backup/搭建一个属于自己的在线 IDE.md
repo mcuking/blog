@@ -102,7 +102,7 @@ Packager 阶段的代码实现是在 CodeSandbox 托管在 GitHub 上的仓库 [
 }
 ```
 
-值得一提的是为了提升 npm 在线打包的速度，CodeSandbox 作者使用了 AWS 提供的 S3 云存储服务。当某个版本的 npm 包已经打包过一次的话，会将打包的结果 `manifest.json` 文件存储到 S3 上。在下一次请求同样版本的包时，就可以直接返回储存的 `manifest.json` 文件，而不需要重复上面的流程了。在私有化部署中可以将 S3 替换成你自己的文件存储服务。
+值得一提的是为了提升 npm 在线打包的速度，CodeSandbox 作者使用了 AWS 提供的 S3 云存储服务。当某个版本的 npm 包已经打包过一次的话，会将打包的结果 -- `manifest.json` 文件存储到 S3 上。在下一次请求同样版本的包时，就可以直接返回储存的 `manifest.json` 文件，而不需要重复上面的流程了。在私有化部署中可以将 S3 替换成你自己的文件存储服务。
 
 #### Transpilation--编译阶段
 
@@ -115,23 +115,23 @@ import babelTranspiler from "../../transpilers/babel";
 ...
 
 const preset = new Preset(
-    "create-react-app",
-    ["web.js", "js", "json", "web.jsx", "jsx", "ts", "tsx"], {
-        hasDotEnv: true,
-        setup: manager => {
-            const babelOptions = {...};
-            preset.registerTranspiler(
-                module =>
-                /\.(t|j)sx?$/.test(module.path) && !module.path.endsWith(".d.ts"),
-                [{
-                    transpiler: babelTranspiler,
-                    options: babelOptions
-                }],
-                true
-            );
-            ...
-        }
+  "create-react-app",
+  ["web.js", "js", "json", "web.jsx", "jsx", "ts", "tsx"], {
+    hasDotEnv: true,
+    setup: manager => {
+      const babelOptions = {...};
+      preset.registerTranspiler(
+        module =>
+          /\.(t|j)sx?$/.test(module.path) && !module.path.endsWith(".d.ts"),
+        [{
+          transpiler: babelTranspiler,
+          options: babelOptions
+        }],
+        true
+      );
+      ...
     }
+  }
 );
 ```
 
@@ -176,7 +176,7 @@ CMD ["npm", "run", "dev"]
 
 在 CodeSandbox-client 工程中的 [standalone-packages/react-sandpack](https://github.com/codesandbox/codesandbox-client/tree/master/standalone-packages/react-sandpack) 项目，就是 CodeSandbox 提供的基于 [react](https://reactjs.org/) 实现的的编辑器项目。区别于主项目实现的编辑器，这个编辑器主要是为了给使用者进行定制，所以实现的比较简陋，使用者可以根据自己的需求在这个编辑器的基础上加入自己需要的功能。当然如果没有自定义编辑器的需求，可以直接使用 react-sandpack 项目对应的 npm 包 [react-smooshpack](https://www.npmjs.com/package/react-smooshpack)，使用方式如下：
 
-``` ts
+```ts
 import React from 'react';
 import { render } from 'react-dom';
 import {
@@ -229,11 +229,15 @@ render(<App />, document.getElementById('root'));
 而 CodeSandbox 前端构建的核心部分的目录在 CodeSandbox-client 工程中 [packages/app](https://github.com/codesandbox/codesandbox-client/tree/master/packages/app) 项目，其中的原理已经在上面阐述过了，这里只需要将该项目构建出来的 www 文件夹部署到服务器即可。由于该核心库又依赖了其他库，所以也需要先构建下依赖库。下面笔者写了一个 build.sh 文件，放置在整个项目的一级目录即可。
 
 ```bash
-# # 运行和构建需要 Node 10 环境
-# nvm use 10
+# 运行和构建需要 Node 10 环境
+nvm use 10
 
 # 安装依赖
 yarn
+
+# 如果是第一次构建，需要先将整个项目构建一次，后面需要使用其中的构建产物
+# 如果已经整体项目构建过一次，则无需重新构建
+yarn run build 
 
 # 构建依赖库
 yarn run build:deps
@@ -244,7 +248,7 @@ cd packages/app
 yarn run build:sandpack-sandbox
 
 # 由于一些原因，一些需要的静态文件需要从整体项目的构建目录中获取
-# 因此需要在执行该 shell 脚本之前，将整个项目构建一次，即执行 npm run build 即可（这个构建的时间会比较久）
+# 因此需要在执行该 shell 脚本之前，将整个项目构建一次，即执行 yarn run build 即可（这个构建的时间会比较久）
 cp -rf ../../www/static/* ./www/static
 ```
 
@@ -284,18 +288,18 @@ COPY --from=build /packages/app/www /usr/share/nginx/html/
 
 为了提供获取私有组件样式文件的方法，可以在 [functions/packager/utils](https://github.com/codesandbox/dependency-packager/tree/master/functions/packager/utils) 目录下新建一个文件 `fetch-builtin-component-style.ts` ，核心代码如下：
 
-``` ts
+```ts
 // 根据组件 npm 包名以及通过 yarn 下载到磁盘上的 npm 包路径，读入对应的样式文件内容，并写入到 manifest.json 的 contents 对象上
 const insertStyle = (contents: any, packageName: string, packagePath: string) => {
-  const stylePath = `node_modules/${packageName}/dist/index.css`;
+  const stylePath = `/node_modules/${packageName}/dist/index.css`;
   const styleFilePath = join(
     packagePath,
-    `node_modules/${packageName}/dist/index.css` ,
+    `/node_modules/${packageName}/dist/index.css` ,
   );
 
   if (fs.existsSync(styleFilePath)) {
     contents[stylePath] = {
-      contents: fs.readFileSync(styleFilePath, "utf-8"),
+      content: fs.readFileSync(styleFilePath, "utf-8"),
       isModule: false,
     };
   }
@@ -311,21 +315,21 @@ const fetchBuiltinComponentStyle = (
   // 当 npm 包或者其依赖以及依赖的依赖中有内建组件，则将该内建组件对应的样式文件写入到 manifest.json 文件中
   if (isBuiltinComponent(packageName)) {
     insertStyle(contents, packageName, packagePath);
-
-    Object.keys(dependencyDependencies.dependencyDependencies).forEach(
-      (pkgName) => {
-        if (isBuiltinComponent(pkgName)) {
-          insertStyle(contents, pkgName, packagePath);
-        }
-      },
-    );
   }
+
+  Object.keys(dependencyDependencies.dependencyDependencies).forEach(
+    (pkgName) => {
+      if (isBuiltinComponent(pkgName)) {
+        insertStyle(contents, pkgName, packagePath);
+      }
+    },
+  );
 };
 ```
 
 并在 [functions/packager/index.ts](https://github.com/codesandbox/dependency-packager/blob/master/functions/packager/index.ts) 文件中调用该方法。代码如下：
 
-``` ts
+```ts
 +  // 针对私有组件，将组件样式文件也写到返回给浏览器的 manifest.json 文件中
 +  fetchBuiltinComponentStyle(
 +    contents,
@@ -346,39 +350,42 @@ const response = {
 
 浏览器 CodeSandbox 侧需要提供处理私有组件样式的方法，主要是在 Evaluation 执行阶段将样式文件内容通过 style 标签动态插入到 head 标签上面，可以在 [packages/app/src/sandbox/eval/utils](https://github.com/codesandbox/codesandbox-client/tree/master/packages/app/src/sandbox/eval/utils) 目录下新建一个文件 `insert-builtin-component-style.ts` ，下面是核心代码：
 
-``` ts
+```ts
 // 基于样式文件内容创建 style 标签，并插入到 head 标签上
 const insertStyleNode = (content: string) => {
-	const styleNode = document.createElement('style');
-	styleNode.type = 'text/css';
-	styleNode.innerHTML = content;
-	document.head.appendChild(styleNode);
+  const styleNode = document.createElement('style');
+  styleNode.type = 'text/css';
+  styleNode.innerHTML = content;
+  document.head.appendChild(styleNode);
 }
 
 const insertBuiltinComponentStyle = (manifest: any) => {
-  const {contents, dependencies, dependencyDependencies} = manifest;
+  const { contents, dependencies, dependencyDependencies } = manifest;
 
   // 从依赖以及依赖的依赖中根据 npm 包名筛选出内建组件
   const builtinComponents = Object.keys(dependencyDependencies).filter(pkgName => isBuiltinComponent(pkgName));
-	dependencies.map((d: any) => {
-		if (isBuiltinComponent(d.name)) {
-				builtinComponents.push(d.name);
-		}
-	});
+  dependencies.map((d: any) => {
+    if (isBuiltinComponent(d.name)) {
+      builtinComponents.push(d.name);
+    }
+  });
 
   // 根据基于内建组件 npm 名称拼装成的 key 查找到具体的文件内容，并调用 insertStyleNode 方法插入到 head 标签上
-	builtinComponents.forEach(name => {
-		const { content } = contents[ `/node_modules/${name}/dist/index.css` ];
-		if (content) {
-				insertStyleNode(content);
-		}
-	});
+  builtinComponents.forEach(name => {
+    const styleContent = contents[`/node_modules/${name}/dist/index.css`];
+    if (styleContent) {
+      const { content } = styleContent;
+      if (content) {
+        insertStyleNode(content);
+      }
+    }
+  });
 }
 ```
 
 并在 Evaluation 执行阶段调用该方法，相关文件在 [packages/sandpack-core/src/manager.ts](https://github.com/codesandbox/codesandbox-client/blob/master/packages/sandpack-core/src/manager.ts) ，具体修改如下：
 
-``` ts
+```ts
 ...
 setManifest(manifest?: Manifest) {
   this.manifest = manifest || {
@@ -404,28 +411,28 @@ setManifest(manifest?: Manifest) {
 
 ```js
 const fetchScreenShot = async () => {
-    const app = document.querySelector('#root');
-    const c = await html2canvas(app);
-    const imgData = c.toDataURL('image/png');
-    window.parent.postMessage({
-        type: 'SCREENSHOT_DATA',
-        payload: {
-            imgData
-        }
-    }, '*');
+  const app = document.querySelector('#root');
+  const c = await html2canvas(app);
+  const imgData = c.toDataURL('image/png');
+  window.parent.postMessage({
+    type: 'SCREENSHOT_DATA',
+    payload: {
+      imgData
+    }
+  }, '*');
 };
 
 const receiveMessageFromIndex = (event) => {
-    const {
-        type
-    } = event.data;
-    switch (type) {
-        case 'FETCH_SCREENSHOT':
-            fetchScreenShot();
-            break;
-        default:
-            break;
-    }
+  const {
+    type
+  } = event.data;
+  switch (type) {
+    case 'FETCH_SCREENSHOT':
+      fetchScreenShot();
+      break;
+    default:
+      break;
+  }
 };
 
 window.addEventListener('message', receiveMessageFromIndex, false);
@@ -460,7 +467,7 @@ export default function initialize() {
 
 可以将打包 npm 的服务换成上面私有化部署的服务，以解决无法获取私有 npm 包等问题。相关文件在 [packages/sandpack-core/src/npm/preloaded/fetch-dependencies.ts](https://github.com/codesandbox/codesandbox-client/blob/master/packages/sandpack-core/src/npm/preloaded/fetch-dependencies.ts) 。修改代码如下：
 
-``` ts
+```ts
  const PROD_URLS = {
    ...
 //  替换成自己的在线 npm 打包服务即可
