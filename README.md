@@ -1,9 +1,5 @@
 > 记录技术成长过程中思考和沉淀，欢迎查阅 Star
 
-### 心得体会
-
-- [2019 与我的技术之路](https://github.com/mcuking/blog/issues/64)
-
 ### 架构
 
 - [Hybrid App 离线包方案实践](https://github.com/mcuking/blog/issues/63)
