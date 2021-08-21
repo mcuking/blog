@@ -1,8 +1,9 @@
-> 记录技术成长过程中思考和沉淀，欢迎查阅 Star
+> 记录技术成长过程中思考与沉淀，欢迎查阅和关注
 
 ### 深入 WebAssembly 系列
 
 - [深入 WebAssembly 之解释器实现篇](https://github.com/mcuking/blog/issues/96)
+- [深入 WebAssembly 之视频播放器应用篇](https://github.com/mcuking/blog/issues/98)
 
 ### 架构
 
