@@ -1,12 +1,16 @@
 > 记录技术成长过程中思考与沉淀，欢迎查阅和关注
 
-### 沙箱系列
+### WebAssembly 系列
 
 - [WebAssembly 解释器实现篇](https://github.com/mcuking/blog/issues/96)
 
+### 浏览器沙箱系列
+
 - [搭建一个属于自己的在线 IDE](https://github.com/mcuking/blog/issues/86)
 
-- [CodeSandbox 沙箱性能优化篇](https://github.com/mcuking/blog/issues/110)
+- [云音乐低代码：基于 CodeSandbox 的沙箱性能优化](https://github.com/mcuking/blog/issues/110)
+
+- [搭建一个浏览器版 Vite 沙箱](https://github.com/mcuking/blog/issues/111)
 
 ### Hybrid 系列
 
@@ -18,17 +22,4 @@
 
 - [跨项目区块复用方案实践](https://github.com/mcuking/blog/issues/88)
 
-- [前端分层架构实践心得](https://github.com/mcuking/blog/issues/65)
-
-- [基于 Vue 技术栈的微前端方案实践](https://github.com/mcuking/blog/issues/81)
-
-### 赞助
-
-如果觉得文章有价值，欢迎打赏点零花钱，激励笔者输出更多优质文章 (⁎⁍̴̛ᴗ⁍̴̛⁎)
-
-<table>
-  <tr>
-    <td><img src="https://i.loli.net/2021/09/12/XLGbo5YuyDePxnw.png" width=200/></td>
-    <td><img src="https://i.loli.net/2021/09/12/pBYlJ9Fh4A7cUaX.png" width=200/></td>
-  </tr>
-</table>
+<img src="https://p5.music.126.net/obj/wo3DlcOGw6DClTvDisK1/13992673209/34ae/2e68/4c95/5e7760ab26d65ad5426fe90546d79b41.png" width=800/>
