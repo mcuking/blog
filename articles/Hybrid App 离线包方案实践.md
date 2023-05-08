@@ -4,7 +4,7 @@
 
 在 H5 + Native 的混合开发模式中，让人诟病最多的恐怕就是加载 H5 页面过程中的白屏问题了。下面这张图描述了从 WebView 初始化到 H5 页面最终渲染的整个过程。
 
-![image](https://user-gold-cdn.xitu.io/2019/12/25/16f3d676881beb50?w=965&h=317&f=png&s=34093)
+![渲染过程](https://p6.music.126.net/obj/wonDlsKUwrLClGjCm8Kx/14766953297/eea3/10d4/7306/782b4b7d53c496e29b37f54502b433fd.png)
 
 其中目前主流的优化方式主要包括：
 
@@ -26,7 +26,7 @@
 
 下面是整体技术方案图，其中 CI/CD 我默认使用 Jenkins，当然也可以采用其它方式。
 
-![image](https://user-gold-cdn.xitu.io/2019/12/25/16f3db603506bc29?w=1040&h=780&f=png&s=145775)
+![原理图](https://p6.music.126.net/obj/wonDlsKUwrLClGjCm8Kx/14766952436/c4de/799f/98c0/8f1c8dadf7fe35a588df37aa11f3d70f.png)
 
 ### 前端部分
 
